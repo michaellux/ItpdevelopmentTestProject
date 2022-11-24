@@ -37,31 +37,60 @@
         </thead>
         <tbody>
             @{
-                int rowNo = 0;
-                
+                int rowNo = 1;
             }
             @foreach (var item in Model)
             {
                 <tr>
                     <td>
-                        @rowNo++;
-                    </td>
-                    <td>
-                        @String.Format("0:HH:mm", item.CancelDate - item.StartDate);
-                    </td>
-                    <td>
-                        //@Html.DisplayFor(modelItem => item.TaskName)
+                        @rowNo
                     </td>
                     <td>
                         @{
-                            var taskComment = item.TaskComments.First(item => item.TaskId == item.Id);
+                            TimeSpan diff = item.CancelDate - item.StartDate ?? TimeSpan.Zero;
                         }
-                        <p>@taskComment.Content<p/>
+                        @string.Format("{0:hh\\:mm}", diff)
                     </td>
                     <td>
+                        @Html.DisplayFor(modelItem => item.TaskName)
+                    </td>
+                    <td>
+                        @{
+                            var taskComment = item.TaskComments.FirstOrDefault(taskComment => taskComment.TaskId == item.Id);
+                        }
+                        <p>
+                            @if (taskComment != null){
+                                @if (taskComment.CommentType == 1)
+                                {
+                                    @System.Text.Encoding.UTF8.GetString(taskComment.Content)
+                                }
+                                else if (taskComment.CommentType == 2)
+                                {
+                                    @Html.ActionLink("Attachment", "DownLoadFile", new { id = taskComment.Id })
+                                }
+                            }
+                        <p/>
+                    </td>
+                    <td>
+                        @string.Format("{0:hh\\:mm}", item.StartDate)
+                    </td>
+                    <td>
+                        @{
+                            var cancelDate = item.CancelDate;
+                            string withoutCancelDateValue = "00:00";
+                        }
+                        @if (cancelDate != null)
+                        {
+                            @string.Format("{0:hh\\:mm}", cancelDate)
+                        }
+                        else
+                        {
+                            @withoutCancelDateValue
+                        }
                         
                     </td>
                 </tr>
+                rowNo++;
             }
         </tbody>
     </table>

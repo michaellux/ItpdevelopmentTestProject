@@ -6,7 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-string connection = "Server=(localdb)\\MSSQLLocalDB;Database=ItpdevelopmentTestProject";
+
+
+string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ItpdevelopmentTestProjectContext>(options => options.UseSqlServer(connection));
 
 var app = builder.Build();
