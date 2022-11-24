@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="C:\Users\Michaellux.DESKTOP-MUO1A9P\Downloads\Mime-Detective-master\MimeDetective\MimeDetective.csproj" />
+    <Folder Include="Plugins\MimeDetective\" />
   </ItemGroup>
 
 </Project>
