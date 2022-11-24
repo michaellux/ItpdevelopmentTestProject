@@ -1,0 +1,68 @@
+﻿@model IEnumerable<ItpdevelopmentTestProject.Models.Task>;
+@{
+    ViewData["Title"] = "Task table";
+    ViewData["Number in order"] = "#";
+    ViewData["The amount of time spent on the task"] = "Times";
+    ViewData["Description of the task. It can be either a file or just a text field, provide for switching."] = "Description";
+}
+
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+
+    <p>
+        <a asp-action="Create">Create new Task</a>
+    </p>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    @ViewData["Number in order"]
+                </th>
+                <th>
+                    @ViewData["The amount of time spent on the task"]
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TaskName)
+                </th>
+                <th>
+                    @ViewData["Description of the task. It can be either a file or just a text field, provide for switching."]
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.StartDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CancelDate)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int rowNo = 0;
+                
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @rowNo++;
+                    </td>
+                    <td>
+                        @String.Format("0:HH:mm", item.CancelDate - item.StartDate);
+                    </td>
+                    <td>
+                        //@Html.DisplayFor(modelItem => item.TaskName)
+                    </td>
+                    <td>
+                        @{
+                            var taskComment = item.TaskComments.First(item => item.TaskId == item.Id);
+                        }
+                        <p>@taskComment.Content<p/>
+                    </td>
+                    <td>
+                        
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

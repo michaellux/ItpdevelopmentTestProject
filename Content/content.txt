@@ -1,0 +1,19 @@
+{
+    "status": "OK",
+    "code": 200,
+    "total": 1,
+    "data": [
+        {
+            "id": 1,
+            "street": "457 Fahey River",
+            "streetName": "O'Connell River",
+            "buildingNumber": "6760",
+            "city": "Prohaskafort",
+            "zipcode": "91738",
+            "country": "San Marino",
+            "county_code": "VG",
+            "latitude": 51.127373,
+            "longitude": 142.898719
+        }
+    ]
+}
