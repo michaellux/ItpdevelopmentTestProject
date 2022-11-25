@@ -1,0 +1,171 @@
+﻿@model IEnumerable<ItpdevelopmentTestProject.Models.Project>;
+@{
+    ViewData["Title"] = "Projects";
+    ViewData["Number in order"] = "#";
+    ViewData["The amount of time spent on the task"] = "Times";
+    ViewData["Description of the task. It can be either a file or just a text field, provide for switching."] = "Description";
+}
+<style>
+    section.project {
+        margin-bottom: 3rem;
+        border: 1px solid #cfbfbf;
+        padding: 2rem;
+    }
+
+    .created {
+        margin-bottom: 0rem;
+    }
+</style>
+<script type="text/javascript">
+    Vue.component('vue-project', {
+        props: {
+            id: String,
+        },
+        data() {
+            return {
+                project: null,
+            }
+        },
+        mounted() {
+            this.getProject(this.id).then((data) => {
+               this.project = data;
+            });
+
+        },
+        methods: {
+            async getProject(id)
+            {
+                const res = await fetch('/Home/GetProject?id=' + id);
+                const project = await res.json();
+                return project;
+            },
+        },
+        template: '#vue-project-template'
+    });
+    Vue.component('vue-task', {
+        props: {
+            task: Object,
+            order: String
+        },
+        //data() {
+        //    return {
+        //        task: null
+        //    }
+        //},
+        //mounted() {
+        //    this.getTask(this.id).then((data) => {
+        //        this.task = data;
+        //    });
+        //},
+        //methods: {
+        //    async getTask(id) {
+        //        const res = await fetch('/Home/GetTask?id=' + id);
+        //        const task = await res.json();
+        //        return task;
+        //    }
+        //},
+        template: '#vue-task-template'
+    });
+
+</script>
+<script type="text/template" id="vue-project-template">    
+     <section class="project">
+        <h2 v-if="id">{{project.ProjectName}}</h2>
+         <p class="created">Created: {{project.CreateDate}}</p>
+         <p class="updated">Updated: {{project.UpdateDate}}</p>
+            @{
+                var task = Model.First().Tasks.First();
+            }
+           <table class="table table-striped">
+               <thead>
+                   <tr>
+                       <th>
+                            @ViewData["Number in order"]
+                       </th>
+                       <th>
+                            @ViewData["The amount of time spent on the task"]
+                       </th>
+                       <th>
+                            @Html.DisplayNameFor(project => task.TaskName)
+                       </th>
+                       <th>
+                            @ViewData["Description of the task. It can be either a file or just a text field, provide for switching."]
+                       </th>
+                       <th>
+                            @Html.DisplayNameFor(project => task.StartDate)
+                       </th>
+                       <th>
+                            @Html.DisplayNameFor(project => task.CancelDate)
+                       </th>
+                   </tr>
+               </thead>
+               <tbody>
+                     <vue-task v-for="(task, index) in project.Tasks" :task="task" :order="index">
+
+                      </vue-task>
+
+
+@*                           <tr>
+                               <td>
+                @rowNo
+                               </td>
+                               <td>
+                @{
+                    TimeSpan diff = projectTask.CancelDate - projectTask.StartDate ?? TimeSpan.Zero;
+                }
+                @string.Format("{0:hh\\:mm}", diff)
+                               </td>
+                               <td>
+                @Html.DisplayFor(modelItem => projectTask.TaskName)
+                               </td>
+                               <td>
+                @{
+                    var taskComment = projectTask.TaskComments.FirstOrDefault(taskComment => taskComment.TaskId == projectTask.Id);
+                }
+                                   <p>
+                    @if (taskComment != null)
+                    {
+                        @if (taskComment.CommentType == 1)
+                        {
+                            @System.Text.Encoding.UTF8.GetString(taskComment.Content)
+                        }
+                        else if (taskComment.CommentType == 2)
+                        {
+                            @Html.ActionLink("Attachment", "DownLoadFile", new { id = taskComment.Id })
+                        }
+                    }
+                                   <p />
+                               </td>
+                               <td>
+                @string.Format("{0:hh\\:mm}", projectTask.StartDate)
+                               </td>
+                               <td>
+                @{
+                    var cancelDate = projectTask.CancelDate;
+                    string withoutCancelDateValue = "00:00";
+                }
+                @if (cancelDate != null)
+                {
+                    @string.Format("{0:hh\\:mm}", cancelDate)
+                }
+                else
+                {
+                    @withoutCancelDateValue
+                }
+
+                               </td>
+                           </tr>*@
+
+               </tbody>
+           </table>
+           <a asp-action="Create">Create new Task</a>
+     </section>
+</script>
+
+<script type="text/template" id="vue-task-template">
+    <tr>
+        <td>
+            {{order}}
+        </td>
+    </tr>
+</script>

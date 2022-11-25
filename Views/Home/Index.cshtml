@@ -1,97 +1,93 @@
-﻿@model IEnumerable<ItpdevelopmentTestProject.Models.Task>;
-@{
-    ViewData["Title"] = "Task table";
-    ViewData["Number in order"] = "#";
-    ViewData["The amount of time spent on the task"] = "Times";
-    ViewData["Description of the task. It can be either a file or just a text field, provide for switching."] = "Description";
-}
-
-<div class="text-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
-
-    <p>
-        <a asp-action="Create">Create new Task</a>
-    </p>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>
-                    @ViewData["Number in order"]
-                </th>
-                <th>
-                    @ViewData["The amount of time spent on the task"]
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.TaskName)
-                </th>
-                <th>
-                    @ViewData["Description of the task. It can be either a file or just a text field, provide for switching."]
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.StartDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CancelDate)
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @{
-                int rowNo = 1;
-            }
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @rowNo
-                    </td>
-                    <td>
-                        @{
-                            TimeSpan diff = item.CancelDate - item.StartDate ?? TimeSpan.Zero;
-                        }
-                        @string.Format("{0:hh\\:mm}", diff)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TaskName)
-                    </td>
-                    <td>
-                        @{
-                            var taskComment = item.TaskComments.FirstOrDefault(taskComment => taskComment.TaskId == item.Id);
-                        }
-                        <p>
-                            @if (taskComment != null){
-                                @if (taskComment.CommentType == 1)
-                                {
-                                    @System.Text.Encoding.UTF8.GetString(taskComment.Content)
+﻿<div class="text-center">
+    @foreach (var project in Model)
+    {
+       @* <section class="project">
+                <tbody>
+                    @{
+                        int rowNo = 1;
+                    }
+                    @foreach (var projectTask in project.Tasks)
+                    {
+                        <tr>
+                            <td>
+                                @rowNo
+                            </td>
+                            <td>
+                                @{
+                                    TimeSpan diff = projectTask.CancelDate - projectTask.StartDate ?? TimeSpan.Zero;
                                 }
-                                else if (taskComment.CommentType == 2)
-                                {
-                                    @Html.ActionLink("Attachment", "DownLoadFile", new { id = taskComment.Id })
+                                @string.Format("{0:hh\\:mm}", diff)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => projectTask.TaskName)
+                            </td>
+                            <td>
+                                @{
+                                    var taskComment = projectTask.TaskComments.FirstOrDefault(taskComment => taskComment.TaskId == projectTask.Id);
                                 }
-                            }
-                        <p/>
-                    </td>
-                    <td>
-                        @string.Format("{0:hh\\:mm}", item.StartDate)
-                    </td>
-                    <td>
-                        @{
-                            var cancelDate = item.CancelDate;
-                            string withoutCancelDateValue = "00:00";
-                        }
-                        @if (cancelDate != null)
-                        {
-                            @string.Format("{0:hh\\:mm}", cancelDate)
-                        }
-                        else
-                        {
-                            @withoutCancelDateValue
-                        }
-                        
-                    </td>
-                </tr>
-                rowNo++;
-            }
-        </tbody>
-    </table>
+                                <p>
+                                    @if (taskComment != null)
+                                    {
+                                        @if (taskComment.CommentType == 1)
+                                        {
+                                            @System.Text.Encoding.UTF8.GetString(taskComment.Content)
+                                        }
+                                        else if (taskComment.CommentType == 2)
+                                        {
+                                            @Html.ActionLink("Attachment", "DownLoadFile", new { id = taskComment.Id })
+                                        }
+                                    }
+                                <p />
+                            </td>
+                            <td>
+                                @string.Format("{0:hh\\:mm}", projectTask.StartDate)
+                            </td>
+                            <td>
+                                @{
+                                    var cancelDate = projectTask.CancelDate;
+                                    string withoutCancelDateValue = "00:00";
+                                }
+                                @if (cancelDate != null)
+                                {
+                                    @string.Format("{0:hh\\:mm}", cancelDate)
+                                }
+                                else
+                                {
+                                    @withoutCancelDateValue
+                                }
+
+                            </td>
+                        </tr>
+                        rowNo++;
+                    }
+                </tbody>
+            </table>
+            <a asp-action="Create">Create new Task</a>
+        </section>*@
+    }
 </div>
+
+<div id="app" class="project pt-4 text-center">
+    <h1 class="display-4 main__title">@ViewData["Title"]</h1>
+    @{
+        var projectModel = Model;
+    }
+     @foreach (var project in Model)
+    {
+        var name = project.ProjectName; 
+
+        <vue-project class="mb-4" id="@project.Id">
+                
+        </vue-project>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_Project" />
+
+    <script type="text/javascript">
+        var app = new Vue({
+            el: '#app'
+        })
+    </script>
+}

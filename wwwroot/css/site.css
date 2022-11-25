@@ -16,3 +16,7 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.main__title {
+    margin-bottom: 2rem;
+}

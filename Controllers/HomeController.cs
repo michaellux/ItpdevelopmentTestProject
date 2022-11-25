@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using MimeDetective;
+using Newtonsoft.Json;
 
 namespace ItpdevelopmentTestProject.Controllers
 {
@@ -22,7 +23,7 @@ namespace ItpdevelopmentTestProject.Controllers
 
         public IActionResult Index()
         {
-            return View(db.Tasks.Include(task => task.TaskComments));
+            return View(db.Projects.Include(project => project.Tasks));
         }
 
         [HttpGet]
@@ -34,6 +35,27 @@ namespace ItpdevelopmentTestProject.Controllers
             FileType fileType = MimeTypes.GetFileType(() => fileContent);
 
             return File(fileContent, fileType.Mime);
+        }
+
+        [HttpGet]
+        public ContentResult GetProject(Guid id)
+        {
+            Project project = db.Projects.Include(project => project.Tasks).FirstOrDefault(item => item.Id == id);
+            
+            return new ContentResult() { Content = JsonConvert.SerializeObject(project,
+                Formatting.None,
+                        new JsonSerializerSettings()
+                        {
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        }), ContentType = "application/json" }; ;
+        }
+
+        [HttpGet]
+        public JsonResult GetTasksProject(Guid id)
+        {
+            var tasks = db.Projects.FirstOrDefault(item => item.Id == id).Tasks;
+            
+            return Json(tasks);
         }
 
         public IActionResult Privacy()
