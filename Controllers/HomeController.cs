@@ -9,6 +9,7 @@ using MimeDetective;
 using Newtonsoft.Json;
 using System;
 using System.Dynamic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ItpdevelopmentTestProject.Controllers
 {
@@ -60,6 +61,12 @@ namespace ItpdevelopmentTestProject.Controllers
             var tasks = db.Projects.FirstOrDefault(item => item.Id == id).Tasks;
             
             return Json(tasks);
+        }
+
+        [HttpPost]
+        public IActionResult TaskForm()
+        {
+            return View();
         }
 
         public IActionResult Privacy()

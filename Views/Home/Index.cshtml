@@ -1,5 +1,17 @@
-﻿<div id="app" class="project pt-4 text-center">
+﻿@model IEnumerable<ItpdevelopmentTestProject.Models.Project>;
+@{
+    ViewData["Title"] = "Projects";
+    ViewData["Create"] = "Create task";
+    ViewData["CreateButton"] = "Create";
+}
+
+<div id="app" class="project pt-4">
     <h1 class="display-4 main__title">@ViewData["Title"]</h1>
+
+    <button type="button" class="btn btn-primary main__create" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+        @ViewData["Create"]
+    </button>
+
     @{
         var projectModel = Model;
     }
@@ -11,6 +23,42 @@
                 
         </vue-project>
     }
+</div>
+
+
+
+<!-- Модальное окно -->
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">@ViewData["Create"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("TaskForm", "Home", FormMethod.Post))
+                {
+                    <div class="mb-3">
+                        @Html.Label("Name", "TaskName", new { @class= "form-label" })
+                        @Html.TextBox("Name","", new { type="text", @class="form-control" })
+                    </div>
+                    <div class="mb-3">
+                        @Html.Label("Project", "Project", new { @class= "form-label" })
+                        <select name="projectId" class="form-control">
+                            <option value="" disabled selected>Select your option</option>
+                            @foreach (var project in Model)
+                            {
+                                <option value="@project.Id">@project.ProjectName</option>
+                            }
+                        </select>
+                    </div>
+                    <p>
+                        <input class="btn btn-primary" type="submit" value="@ViewData["CreateButton"]" />
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
