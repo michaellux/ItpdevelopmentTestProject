@@ -2,7 +2,6 @@
 @{
     ViewData["Title"] = "Projects";
     ViewData["Number in order"] = "#";
-    ViewData["The amount of time spent on the task"] = "Times";
     ViewData["Description of the task. It can be either a file or just a text field, provide for switching."] = "Description";
 }
 <style>
@@ -45,34 +44,37 @@
     Vue.component('vue-task', {
         props: {
             task: Object,
-            order: String
+            order: Number,
+            times: null
         },
-        //data() {
-        //    return {
-        //        task: null
-        //    }
-        //},
-        //mounted() {
-        //    this.getTask(this.id).then((data) => {
-        //        this.task = data;
-        //    });
-        //},
-        //methods: {
-        //    async getTask(id) {
-        //        const res = await fetch('/Home/GetTask?id=' + id);
-        //        const task = await res.json();
-        //        return task;
-        //    }
-        //},
+        mounted() {
+            this.getTask(this.id).then((data) => {
+                this.task = data;
+            })
+            
+        },
+        methods: {
+            async getTask(id) {
+                const res = await fetch('/Home/GetTask?id=' + id);
+                const task = await res.json();
+                return task;
+            },
+        },
         template: '#vue-task-template'
+    });
+    Vue.component('vue-comment', {
+        props: {
+            comment: Object,
+        },
+        template: '#vue-comment-template'
     });
 
 </script>
 <script type="text/template" id="vue-project-template">    
      <section class="project">
         <h2 v-if="id">{{project.ProjectName}}</h2>
-         <p class="created">Created: {{project.CreateDate}}</p>
-         <p class="updated">Updated: {{project.UpdateDate}}</p>
+        <p class="created">Created: {{project.CreateDateTime}}</p>
+         <p class="updated">Updated: {{project.UpdateDateTime}}</p>
             @{
                 var task = Model.First().Tasks.First();
             }
@@ -83,7 +85,7 @@
                             @ViewData["Number in order"]
                        </th>
                        <th>
-                            @ViewData["The amount of time spent on the task"]
+                            @Html.DisplayNameFor(project => task.SpentTime)
                        </th>
                        <th>
                             @Html.DisplayNameFor(project => task.TaskName)
@@ -100,62 +102,9 @@
                    </tr>
                </thead>
                <tbody>
-                     <vue-task v-for="(task, index) in project.Tasks" :task="task" :order="index">
+                     <vue-task v-for="(task, index) in project.Tasks" :task="task" :order="++index">
 
                       </vue-task>
-
-
-@*                           <tr>
-                               <td>
-                @rowNo
-                               </td>
-                               <td>
-                @{
-                    TimeSpan diff = projectTask.CancelDate - projectTask.StartDate ?? TimeSpan.Zero;
-                }
-                @string.Format("{0:hh\\:mm}", diff)
-                               </td>
-                               <td>
-                @Html.DisplayFor(modelItem => projectTask.TaskName)
-                               </td>
-                               <td>
-                @{
-                    var taskComment = projectTask.TaskComments.FirstOrDefault(taskComment => taskComment.TaskId == projectTask.Id);
-                }
-                                   <p>
-                    @if (taskComment != null)
-                    {
-                        @if (taskComment.CommentType == 1)
-                        {
-                            @System.Text.Encoding.UTF8.GetString(taskComment.Content)
-                        }
-                        else if (taskComment.CommentType == 2)
-                        {
-                            @Html.ActionLink("Attachment", "DownLoadFile", new { id = taskComment.Id })
-                        }
-                    }
-                                   <p />
-                               </td>
-                               <td>
-                @string.Format("{0:hh\\:mm}", projectTask.StartDate)
-                               </td>
-                               <td>
-                @{
-                    var cancelDate = projectTask.CancelDate;
-                    string withoutCancelDateValue = "00:00";
-                }
-                @if (cancelDate != null)
-                {
-                    @string.Format("{0:hh\\:mm}", cancelDate)
-                }
-                else
-                {
-                    @withoutCancelDateValue
-                }
-
-                               </td>
-                           </tr>*@
-
                </tbody>
            </table>
            <a asp-action="Create">Create new Task</a>
@@ -167,5 +116,34 @@
         <td>
             {{order}}
         </td>
+        <td>
+            {{task.SpentTime}}
+        </td>
+        <td>
+            {{task.TaskName}}
+        </td>
+        <td>
+            <vue-comment v-for="(comment, index) in task.TaskComments" :comment="comment">
+
+            </vue-comment>
+        </td>
+        <td>
+            {{task.StartTime}}
+        </td>
+        <td v-if="task.CancelDate">
+            {{task.EndTime}}
+        </td>
+        <td v-else>
+            00:00
+        </td>
     </tr>
+</script>
+
+<script type="text/template" id="vue-comment-template">
+    <p v-if="comment.CommentType == 1">
+        {{comment.Description}}
+    </p>
+    <p v-else-if="comment.CommentType == 2">
+        <a :href="comment.Description">Attachment</a>
+    </p>
 </script>

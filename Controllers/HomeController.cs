@@ -7,6 +7,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MimeDetective;
 using Newtonsoft.Json;
+using System;
+using System.Dynamic;
 
 namespace ItpdevelopmentTestProject.Controllers
 {
@@ -40,8 +42,10 @@ namespace ItpdevelopmentTestProject.Controllers
         [HttpGet]
         public ContentResult GetProject(Guid id)
         {
-            Project project = db.Projects.Include(project => project.Tasks).FirstOrDefault(item => item.Id == id);
             
+            Project project = db.Projects.Include(project => project.Tasks)
+                .ThenInclude(tasks => tasks.TaskComments).FirstOrDefault(item => item.Id == id);
+
             return new ContentResult() { Content = JsonConvert.SerializeObject(project,
                 Formatting.None,
                         new JsonSerializerSettings()
