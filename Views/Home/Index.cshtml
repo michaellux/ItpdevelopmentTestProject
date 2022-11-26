@@ -4,6 +4,7 @@
     ViewData["Title"] = "Projects";
     ViewData["Create"] = "Create task";
     ViewData["CreateButton"] = "Create";
+    ViewData["Description"] = "Descriptions";
 
     var projectModel = Model.Item1;
     var taskModel = Model.Item2;
@@ -54,12 +55,53 @@
                             }
                         </select>
                     </div>
-@*                    <div class="mb-3">
+                    <div class="mb-3">
                         @Html.Label("StartTime", "Start time", new { @class= "form-label" })
+                        @Html.EditorFor(Model => Model.Item2.First().StartDate, new { htmlAttributes = new { @class = "form-control" }})
                     </div>
                     <div class="mb-3">
                         @Html.Label("EndTime", "End time", new { @class= "form-label" })
-                    </div>*@
+                        @Html.EditorFor(Model => Model.Item2.First().CancelDate, new { htmlAttributes = new { @class = "form-control" }})
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@ViewData["Description"]</label>
+                        <div id="createDescriptionFieldButtons">
+                            <input value="Add text" type="button" id="createTextDescriptionField" class="btn btn-outline-secondary btn-sm"/>
+                            <input value="Add file" type="button" id="createFileField" class="btn btn-outline-secondary btn-sm"/>
+                        </div>
+                        <div id="descriptions-block">
+
+                        </div>
+                        <script>
+                            let descriptionFieldBlock = document.getElementById("descriptions-block");
+                            const createDescriptionBlock = () => {
+                                let descriptionField = document.createElement("input");
+                                descriptionField.classList.add('mt-3');
+                                descriptionField.classList.add('mb-3');
+                                descriptionField.classList.add('form-control');
+
+                                return descriptionField;
+                            }
+
+                            document.getElementById("createTextDescriptionField").addEventListener("click", function () {
+                                let descriptionField = createDescriptionBlock();
+                                descriptionField.classList.add('description__textfield');
+                                let textDescriptionFieldCount = document.getElementsByClassName("descripttion__textfield").length;
+                                descriptionField.setAttribute('name', `TextContent__${textDescriptionFieldCount}`);
+                                descriptionFieldBlock.prepend(descriptionField);
+
+                            });
+
+                            document.getElementById("createFileField").addEventListener("click", function () {
+                                let descriptionField = createDescriptionBlock();
+                                descriptionField.setAttribute('type', 'file');
+                                descriptionField.classList.add('description__filefield');
+                                let textDescriptionFieldCount = document.getElementsByClassName("descripttion__filefield").length;
+                                descriptionField.setAttribute('name', `FileContent__${textDescriptionFieldCount}`);
+                                descriptionFieldBlock.prepend(descriptionField);
+                            });
+                        </script>
+                    </div>
                     <p>
                         <input class="btn btn-primary" type="submit" value="@ViewData["CreateButton"]" />
                     </p>
