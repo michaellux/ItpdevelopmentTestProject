@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.Dynamic;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Task = ItpdevelopmentTestProject.Models.Task;
 
 namespace ItpdevelopmentTestProject.Controllers
 {
@@ -26,7 +27,12 @@ namespace ItpdevelopmentTestProject.Controllers
 
         public IActionResult Index()
         {
-            return View(db.Projects.Include(project => project.Tasks));
+            var projects = db.Projects.Include(project => project.Tasks);
+            var tasks = db.Tasks.Include(task => task.TaskComments);
+
+            var tupleModel = new Tuple<IEnumerable<Project>, IEnumerable<Task>>(projects, tasks);
+
+            return View(tupleModel);
         }
 
         [HttpGet]
@@ -66,7 +72,12 @@ namespace ItpdevelopmentTestProject.Controllers
         [HttpPost]
         public IActionResult TaskForm()
         {
-            return View();
+            if (!ModelState.IsValid)
+            {
+                return View("TaskForm");
+            }
+
+            return RedirectToAction("Index");
         }
 
         public IActionResult Privacy()

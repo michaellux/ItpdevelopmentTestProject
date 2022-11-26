@@ -1,8 +1,10 @@
-﻿@model IEnumerable<ItpdevelopmentTestProject.Models.Project>;
+﻿@model Tuple<IEnumerable<Project>, IEnumerable<ItpdevelopmentTestProject.Models.Task>>
 @{
     ViewData["Title"] = "Projects";
     ViewData["Number in order"] = "#";
     ViewData["Description of the task. It can be either a file or just a text field, provide for switching."] = "Description";
+
+    var projectModel = Model.Item1;
 }
 <style>
     section.project {
@@ -76,7 +78,7 @@
         <p class="created">Created: {{project.CreateDateTime}}</p>
          <p class="updated">Updated: {{project.UpdateDateTime}}</p>
             @{
-                var task = Model.First().Tasks.First();
+                var task = projectModel.First().Tasks.First();
             }
            <table class="table table-striped">
                <thead>
@@ -107,7 +109,6 @@
                       </vue-task>
                </tbody>
            </table>
-           <a asp-action="Create">Create new Task</a>
      </section>
 </script>
 

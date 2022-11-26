@@ -1,5 +1,9 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using ItpdevelopmentTestProject.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using Task = ItpdevelopmentTestProject.Models.Task;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +14,9 @@ builder.Services.AddControllersWithViews();
 
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ItpdevelopmentTestProjectContext>(options => options.UseSqlServer(connection));
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddScoped<IValidator<Task>, TaskValidator>();
 
 var app = builder.Build();
 

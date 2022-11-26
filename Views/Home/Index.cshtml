@@ -1,8 +1,12 @@
-﻿@model IEnumerable<ItpdevelopmentTestProject.Models.Project>;
+﻿@model Tuple<IEnumerable<Project>, IEnumerable<ItpdevelopmentTestProject.Models.Task>>
+
 @{
     ViewData["Title"] = "Projects";
     ViewData["Create"] = "Create task";
     ViewData["CreateButton"] = "Create";
+
+    var projectModel = Model.Item1;
+    var taskModel = Model.Item2;
 }
 
 <div id="app" class="project pt-4">
@@ -12,10 +16,7 @@
         @ViewData["Create"]
     </button>
 
-    @{
-        var projectModel = Model;
-    }
-     @foreach (var project in Model)
+    @foreach (var project in projectModel)
     {
         var name = project.ProjectName; 
 
@@ -36,6 +37,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
             <div class="modal-body">
+                <div asp-validation-summary="ModelOnly"></div>
                 @using (Html.BeginForm("TaskForm", "Home", FormMethod.Post))
                 {
                     <div class="mb-3">
@@ -46,12 +48,18 @@
                         @Html.Label("Project", "Project", new { @class= "form-label" })
                         <select name="projectId" class="form-control">
                             <option value="" disabled selected>Select your option</option>
-                            @foreach (var project in Model)
+                            @foreach (var project in projectModel)
                             {
                                 <option value="@project.Id">@project.ProjectName</option>
                             }
                         </select>
                     </div>
+@*                    <div class="mb-3">
+                        @Html.Label("StartTime", "Start time", new { @class= "form-label" })
+                    </div>
+                    <div class="mb-3">
+                        @Html.Label("EndTime", "End time", new { @class= "form-label" })
+                    </div>*@
                     <p>
                         <input class="btn btn-primary" type="submit" value="@ViewData["CreateButton"]" />
                     </p>
