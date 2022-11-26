@@ -11,6 +11,7 @@ using System;
 using System.Dynamic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Task = ItpdevelopmentTestProject.Models.Task;
+using FormHelper;
 
 namespace ItpdevelopmentTestProject.Controllers
 {
@@ -69,15 +70,34 @@ namespace ItpdevelopmentTestProject.Controllers
             return Json(tasks);
         }
 
-        [HttpPost]
-        public IActionResult TaskForm()
+
+        public IActionResult TaskForm(string Name, string Project, DateTime StartDate,
+            DateTime? CancelDate, byte[]? TextContent, byte[]? FileContent)
         {
             if (!ModelState.IsValid)
             {
-                return View("TaskForm");
+                var invalidValues = ModelState
+                    .Values
+                    .Where((value) => value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid);
+                string invalidFields = "";
+
+                foreach(var invalidValue in ModelState)
+                {
+                    if (invalidValue.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                    {
+                        invalidFields += invalidValue.Key + ", ";
+                    }
+                }
+
+                return FormResult.CreateErrorResult($"Check fields: {invalidFields}");
             }
 
-            return RedirectToAction("Index");
+            if (StartDate > CancelDate)
+            {
+                return FormResult.CreateErrorResult("Start time and end time. Start time cannot be greater than End time");
+            }
+
+            return FormResult.CreateSuccessResult("Task created.");
         }
 
         public IActionResult Privacy()

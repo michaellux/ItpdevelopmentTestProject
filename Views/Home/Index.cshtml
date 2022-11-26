@@ -39,15 +39,14 @@
             </div>
             <div class="modal-body">
                 <div asp-validation-summary="ModelOnly"></div>
-                @using (Html.BeginForm("TaskForm", "Home", FormMethod.Post))
-                {
+                <form asp-formhelper="true" asp-controller="Home" asp-action="TaskForm">
                     <div class="mb-3">
-                        @Html.Label("Name", "TaskName", new { @class= "form-label" })
+                        @Html.Label("Name", "Name", new { @class= "form-label" })
                         @Html.TextBox("Name","", new { type="text", @class="form-control" })
                     </div>
                     <div class="mb-3">
                         @Html.Label("Project", "Project", new { @class= "form-label" })
-                        <select name="projectId" class="form-control">
+                        <select name="Project" class="form-control">
                             <option value="" disabled selected>Select your option</option>
                             @foreach (var project in projectModel)
                             {
@@ -87,7 +86,7 @@
                                 let descriptionField = createDescriptionBlock();
                                 descriptionField.classList.add('description__textfield');
                                 let textDescriptionFieldCount = document.getElementsByClassName("descripttion__textfield").length;
-                                descriptionField.setAttribute('name', `TextContent__${textDescriptionFieldCount}`);
+                                descriptionField.setAttribute('name', `TextContent[${textDescriptionFieldCount}]`);
                                 descriptionFieldBlock.prepend(descriptionField);
 
                             });
@@ -97,15 +96,15 @@
                                 descriptionField.setAttribute('type', 'file');
                                 descriptionField.classList.add('description__filefield');
                                 let textDescriptionFieldCount = document.getElementsByClassName("descripttion__filefield").length;
-                                descriptionField.setAttribute('name', `FileContent__${textDescriptionFieldCount}`);
+                                descriptionField.setAttribute('name', `FileContent[${textDescriptionFieldCount}]`);
                                 descriptionFieldBlock.prepend(descriptionField);
                             });
                         </script>
                     </div>
                     <p>
-                        <input class="btn btn-primary" type="submit" value="@ViewData["CreateButton"]" />
+                        <button class="btn btn-primary" value="@ViewData["CreateButton"]" />
                     </p>
-                }
+                </form>
             </div>
         </div>
     </div>

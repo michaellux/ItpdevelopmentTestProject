@@ -1,5 +1,6 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using FormHelper;
 using ItpdevelopmentTestProject.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,9 +15,9 @@ builder.Services.AddControllersWithViews();
 
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ItpdevelopmentTestProjectContext>(options => options.UseSqlServer(connection));
-
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddScoped<IValidator<Task>, TaskValidator>();
+builder.Services.AddControllersWithViews().AddFormHelper();
+//builder.Services.AddFluentValidationAutoValidation();
+//builder.Services.AddScoped<IValidator<Task>, TaskValidator>();
 
 var app = builder.Build();
 
@@ -38,5 +39,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.UseFormHelper();
 
 app.Run();
