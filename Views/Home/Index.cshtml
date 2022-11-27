@@ -2,7 +2,8 @@
 
 @{
     ViewData["Title"] = "Projects";
-    ViewData["Create"] = "Create task";
+    ViewData["CreateProject"] = "Create project";
+    ViewData["CreateTask"] = "Create task";
     ViewData["CreateButton"] = "Create";
     ViewData["Description"] = "Descriptions";
 
@@ -13,13 +14,29 @@
 <div id="app" class="project pt-4">
     <h1 class="display-4 main__title">@ViewData["Title"]</h1>
 
+    <button type="button" class="btn btn-info main__create" data-bs-toggle="modal" data-bs-target="#createProjectModal">
+        @ViewData["CreateProject"]
+    </button>
     <button type="button" class="btn btn-primary main__create" data-bs-toggle="modal" data-bs-target="#createTaskModal">
-        @ViewData["Create"]
+        @ViewData["CreateTask"]
     </button>
     @foreach (var project in projectModel)
     {
+        
+        List<TimeSpan> periods = new();
+
+        foreach (var item in project.Tasks)
+        {
+            periods.Add(item.Period);
+        }
+
+        TimeSpan totalPeriod = periods.Aggregate(TimeSpan.Zero, (subtotal, t) => subtotal.Add(t));
+        string final = string.Format("{0:hh\\:mm}", totalPeriod);
+      
+     
+
         var name = project.ProjectName;
-        <vue-project class="mb-4" id="@project.Id">
+        <vue-project class="mb-4" id="@project.Id" total="@final">
                 
         </vue-project>
     }
@@ -32,7 +49,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">@ViewData["Create"]</h5>
+                <h5 class="modal-title" id="exampleModalLabel">@ViewData["CreateTask"]</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
             <div class="modal-body">
@@ -100,7 +117,30 @@
                         </script>
                     </div>
                     <p>
-                        <button class="btn btn-primary" value="@ViewData["CreateButton"]" />
+                        <button class="btn btn-primary">@ViewData["CreateButton"]</button>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createProjectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">@ViewData["CreateProject"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <div asp-validation-summary="ModelOnly"></div>
+                <form asp-formhelper="true" asp-controller="Home" asp-action="ProjectForm">
+                    <div class="mb-3">
+                        @Html.Label("Name", "Name", new { @class= "form-label" })
+                        @Html.TextBox("Name","", new { type="text", @class="form-control" })
+                    </div>
+                    <p>
+                        <button class="btn btn-primary">@ViewData["CreateButton"]</button>
                     </p>
                 </form>
             </div>

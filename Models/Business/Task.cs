@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -11,10 +12,37 @@ namespace ItpdevelopmentTestProject.Models
         {
             get
             {
-                TimeSpan diff = CancelDate - StartDate ?? TimeSpan.Zero;
+                TimeSpan diff = (CancelDate == null ? DateTime.UtcNow : CancelDate) - StartDate ?? TimeSpan.Zero;
                 return string.Format("{0:hh\\:mm}", diff);
             }
         }
+
+        public TimeSpan Period
+        {
+            get
+            {
+                TimeSpan diff = (CancelDate == null ? DateTime.UtcNow : CancelDate) - StartDate ?? TimeSpan.Zero;
+                return diff;
+            }
+        }
+
+        //public string TotalSpentTime(ItpdevelopmentTestProjectContext context)
+        //{
+
+        //    var tasks = context.Tasks;
+
+        //    List<TimeSpan> periods = new();
+
+        //    foreach (var task in tasks)
+        //    {
+        //        periods.Add(task.Period);
+        //    }
+
+        //    TimeSpan total = periods.Aggregate(TimeSpan.Zero, (subtotal, t) => subtotal.Add(t))
+
+        //    return 
+        //}
+
         public string StartTime
         {
             get
@@ -31,7 +59,7 @@ namespace ItpdevelopmentTestProject.Models
             }
         }
 
-        public static async System.Threading.Tasks.Task CreateTask(ItpdevelopmentTestProjectContext context, string Name, string Project, DateTime StartDate,
+        public static async System.Threading.Tasks.Task Create(ItpdevelopmentTestProjectContext context, string Name, string Project, DateTime StartDate,
             DateTime? CancelDate, string[]? TextContent, List<byte[]>? FileContent)
         {
             Guid taskGuid = Guid.NewGuid();

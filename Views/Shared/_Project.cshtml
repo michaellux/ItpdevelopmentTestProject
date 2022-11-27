@@ -5,6 +5,7 @@
     ViewData["Description of the task. It can be either a file or just a text field, provide for switching."] = "Description";
 
     var projectModel = Model.Item1;
+    var taskModel = Model.Item2;
 }
 <style>
     section.project {
@@ -24,6 +25,7 @@
         },
         props: {
             id: String,
+            total: String
         },
         data() {
             return {
@@ -129,6 +131,7 @@
             
         </tbody>
     </table>
+    <p>Total time: {{total}}</p>
       <pagination :records="project.Tasks.length" v-model="page" :per-page="perPage">
               </pagination>
      </section>

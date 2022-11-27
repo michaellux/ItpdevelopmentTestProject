@@ -107,11 +107,22 @@ namespace ItpdevelopmentTestProject.Controllers
                 }
             }
 
-            Task.CreateTask(db, Name, Project, StartDate, CancelDate, TextContent, FileContent);
+            Task.Create(db, Name, Project, StartDate, CancelDate, TextContent, FileContent);
 
             return FormResult.CreateSuccessResult("Task created.");
         }
 
+        public IActionResult ProjectForm(string Name)
+        {
+            if (!ModelState.IsValid)
+            {
+                return FormResult.CreateErrorResult("Check project name");
+            }
+
+            Project.CreateAsync(db, Name);
+
+            return FormResult.CreateSuccessResult("Project created.");
+        }
 
         public IActionResult Privacy()
         {
