@@ -1,15 +1,9 @@
 ﻿using ItpdevelopmentTestProject.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
 using MimeDetective;
 using Newtonsoft.Json;
-using System;
-using System.Dynamic;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Task = ItpdevelopmentTestProject.Models.Task;
 using FormHelper;
 
@@ -72,7 +66,7 @@ namespace ItpdevelopmentTestProject.Controllers
 
 
         public IActionResult TaskForm(string Name, string Project, DateTime StartDate,
-            DateTime? CancelDate, byte[]? TextContent, byte[]? FileContent)
+            DateTime? CancelDate, string[]? TextContent)
         {
             if (!ModelState.IsValid)
             {
@@ -97,8 +91,27 @@ namespace ItpdevelopmentTestProject.Controllers
                 return FormResult.CreateErrorResult("Start time and end time. Start time cannot be greater than End time");
             }
 
+            List<byte[]>? FileContent = new();
+
+            IFormFileCollection fileCollection = HttpContext.Request.Form.Files;
+            foreach (var file in fileCollection)
+            {
+                if (file.Length > 0)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        file.CopyTo(ms);
+                        var fileBytes = ms.ToArray();
+                        FileContent.Add(fileBytes);
+                    }
+                }
+            }
+
+            Task.CreateTask(db, Name, Project, StartDate, CancelDate, TextContent, FileContent);
+
             return FormResult.CreateSuccessResult("Task created.");
         }
+
 
         public IActionResult Privacy()
         {

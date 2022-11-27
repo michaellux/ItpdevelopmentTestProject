@@ -19,11 +19,16 @@
 </style>
 <script type="text/javascript">
     Vue.component('vue-project', {
+        components: {
+            Pagination
+        },
         props: {
             id: String,
         },
         data() {
             return {
+                page: 1,
+                perPage: 2,
                 project: null,
             }
         },
@@ -31,7 +36,18 @@
             this.getProject(this.id).then((data) => {
                this.project = data;
             });
+        },
+        computed: {
+            displayedRecords() {
+                const startIndex = this.perPage * (this.page - 1);
+                const endIndex = startIndex + this.perPage;
 
+                let tasks = this.project.Tasks;
+
+                tasks = tasks.map((obj, order) => ({ ...obj, order: ++order }));
+
+                return tasks.slice(startIndex, endIndex);
+            }
         },
         methods: {
             async getProject(id)
@@ -40,13 +56,15 @@
                 const project = await res.json();
                 return project;
             },
+            callback: function (page) {
+                // no need for callback here since you have all your data loaded already
+            }
         },
         template: '#vue-project-template'
     });
     Vue.component('vue-task', {
         props: {
             task: Object,
-            order: Number,
             times: null
         },
         mounted() {
@@ -77,45 +95,49 @@
         <h2 v-if="id">{{project.ProjectName}}</h2>
         <p class="created">Created: {{project.CreateDateTime}}</p>
          <p class="updated">Updated: {{project.UpdateDateTime}}</p>
-            @{
-                var task = projectModel.First().Tasks.First();
-            }
-           <table class="table table-striped">
-               <thead>
-                   <tr>
-                       <th>
-                            @ViewData["Number in order"]
-                       </th>
-                       <th>
-                            @Html.DisplayNameFor(project => task.SpentTime)
-                       </th>
-                       <th>
-                            @Html.DisplayNameFor(project => task.TaskName)
-                       </th>
-                       <th>
-                            @ViewData["Description of the task. It can be either a file or just a text field, provide for switching."]
-                       </th>
-                       <th>
-                            @Html.DisplayNameFor(project => task.StartDate)
-                       </th>
-                       <th>
-                            @Html.DisplayNameFor(project => task.CancelDate)
-                       </th>
-                   </tr>
-               </thead>
-               <tbody>
-                     <vue-task v-for="(task, index) in project.Tasks" :task="task" :order="++index">
 
-                      </vue-task>
-               </tbody>
-           </table>
+        @{
+            var task = projectModel.First().Tasks.First();
+        }
+        <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    @ViewData["Number in order"]
+                </th>
+                <th>
+                    @Html.DisplayNameFor(project => task.SpentTime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(project => task.TaskName)
+                </th>
+                <th>
+                    @ViewData["Description of the task. It can be either a file or just a text field, provide for switching."]
+                </th>
+                <th>
+                    @Html.DisplayNameFor(project => task.StartDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(project => task.CancelDate)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <vue-task v-for="(task, index) in displayedRecords" :task="task" :key="index">
+
+            </vue-task>
+            
+        </tbody>
+    </table>
+      <pagination :records="project.Tasks.length" v-model="page" :per-page="perPage">
+              </pagination>
      </section>
 </script>
 
 <script type="text/template" id="vue-task-template">
     <tr>
         <td>
-            {{order}}
+            {{task.order}}
         </td>
         <td>
             {{task.SpentTime}}

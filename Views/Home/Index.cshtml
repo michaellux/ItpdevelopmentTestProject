@@ -16,11 +16,9 @@
     <button type="button" class="btn btn-primary main__create" data-bs-toggle="modal" data-bs-target="#createTaskModal">
         @ViewData["Create"]
     </button>
-
     @foreach (var project in projectModel)
     {
-        var name = project.ProjectName; 
-
+        var name = project.ProjectName;
         <vue-project class="mb-4" id="@project.Id">
                 
         </vue-project>
@@ -39,7 +37,7 @@
             </div>
             <div class="modal-body">
                 <div asp-validation-summary="ModelOnly"></div>
-                <form asp-formhelper="true" asp-controller="Home" asp-action="TaskForm">
+                <form enctype="multipart/form-data" asp-formhelper="true" asp-controller="Home" asp-action="TaskForm">
                     <div class="mb-3">
                         @Html.Label("Name", "Name", new { @class= "form-label" })
                         @Html.TextBox("Name","", new { type="text", @class="form-control" })
@@ -85,7 +83,7 @@
                             document.getElementById("createTextDescriptionField").addEventListener("click", function () {
                                 let descriptionField = createDescriptionBlock();
                                 descriptionField.classList.add('description__textfield');
-                                let textDescriptionFieldCount = document.getElementsByClassName("descripttion__textfield").length;
+                                let textDescriptionFieldCount = document.getElementsByClassName("description__textfield").length;
                                 descriptionField.setAttribute('name', `TextContent[${textDescriptionFieldCount}]`);
                                 descriptionFieldBlock.prepend(descriptionField);
 
@@ -95,7 +93,7 @@
                                 let descriptionField = createDescriptionBlock();
                                 descriptionField.setAttribute('type', 'file');
                                 descriptionField.classList.add('description__filefield');
-                                let textDescriptionFieldCount = document.getElementsByClassName("descripttion__filefield").length;
+                                let textDescriptionFieldCount = document.getElementsByClassName("description__filefield").length;
                                 descriptionField.setAttribute('name', `FileContent[${textDescriptionFieldCount}]`);
                                 descriptionFieldBlock.prepend(descriptionField);
                             });
