@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -12,11 +13,16 @@ public partial class Task
     [Display (Name = "Ticket")]
     public string TaskName { get; set; } = null!;
 
+    [BindProperty]
     public Guid ProjectId { get; set; }
 
     [Display(Name = "Start")]
+    [BindProperty]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
     public DateTime StartDate { get; set; }
     [Display(Name = "End")]
+    [BindProperty]
+    [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
     public DateTime? CancelDate { get; set; }
 
     public DateTime CreateDate { get; set; }

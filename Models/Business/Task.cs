@@ -111,6 +111,14 @@ namespace ItpdevelopmentTestProject.Models
 
             await context.SaveChangesAsync();
         }
-            
+
+
+        internal static async System.Threading.Tasks.Task Update(ItpdevelopmentTestProjectContext context, Task task,  string[]? TextContent, List<byte[]>? FileContent)
+        {
+            task.UpdateDate = DateTime.UtcNow;
+            context.Tasks.Update(task);
+            await context.SaveChangesAsync();
+        }
+
     }
 }

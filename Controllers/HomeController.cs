@@ -64,35 +64,12 @@ namespace ItpdevelopmentTestProject.Controllers
             return Json(tasks);
         }
 
-
         public IActionResult TaskForm(string Name, string Project, DateTime StartDate,
             DateTime? CancelDate, string[]? TextContent)
         {
-            if (!ModelState.IsValid)
-            {
-                var invalidValues = ModelState
-                    .Values
-                    .Where((value) => value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid);
-                string invalidFields = "";
-
-                foreach(var invalidValue in ModelState)
-                {
-                    if (invalidValue.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
-                    {
-                        invalidFields += invalidValue.Key + ", ";
-                    }
-                }
-
-                return FormResult.CreateErrorResult($"Check fields: {invalidFields}");
-            }
-
-            if (StartDate > CancelDate)
-            {
-                return FormResult.CreateErrorResult("Start time and end time. Start time cannot be greater than End time");
-            }
+            return Validate(StartDate, CancelDate);
 
             List<byte[]>? FileContent = new();
-
             IFormFileCollection fileCollection = HttpContext.Request.Form.Files;
             foreach (var file in fileCollection)
             {
@@ -107,7 +84,7 @@ namespace ItpdevelopmentTestProject.Controllers
                 }
             }
 
-            Task.Create(db, Name, Project, StartDate, CancelDate, TextContent, FileContent);
+            ItpdevelopmentTestProject.Models.Task.Create(db, Name, Project, StartDate, CancelDate, TextContent, FileContent);
 
             return FormResult.CreateSuccessResult("Task created.");
         }
@@ -124,10 +101,88 @@ namespace ItpdevelopmentTestProject.Controllers
             return FormResult.CreateSuccessResult("Project created.");
         }
 
-        public IActionResult Privacy()
+        public async Task<IActionResult> TaskAsync(Guid? id)
         {
-            return View();
+            if (id != null)
+            {
+                var projects = db.Projects.Include(project => project.Tasks);
+
+                ItpdevelopmentTestProject.Models.Task? task = await db.Tasks.Include(tasks => tasks.TaskComments).Include(tasks => tasks.Project).FirstOrDefaultAsync(p => p.Id == id);
+                var tupleModel = new Tuple<IEnumerable<Project>, ItpdevelopmentTestProject.Models.Task?>(projects, task);
+                if (task != null) return View(tupleModel);
+            }
+            return NotFound();
         }
+
+        [HttpPost]
+        public IActionResult EditTaskForm(Task task, string[]? TextContent)
+        {
+            if (task.StartDate > task.CancelDate)
+            {
+                return FormResult.CreateErrorResult("Start time and end time. Start time cannot be greater than End time");
+            }
+            if (string.IsNullOrEmpty(task.TaskName))
+            {
+                return FormResult.CreateErrorResult("Name is empty");
+            }
+
+
+            List<byte[]>? FileContent = new();
+            IFormFileCollection fileCollection = HttpContext.Request.Form.Files;
+            foreach (var file in fileCollection)
+            {
+                if (file.Length > 0)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        file.CopyTo(ms);
+                        var fileBytes = ms.ToArray();
+                        FileContent.Add(fileBytes);
+                    }
+                }
+            }
+            try
+            {
+                ItpdevelopmentTestProject.Models.Task.Update(db, task, TextContent, FileContent);
+                return FormResult.CreateSuccessResult("Task created.");
+            }
+            catch (Exception e)
+            {
+                return FormResult.CreateErrorResult($"Problem with save: {e.Message}");
+            }
+
+
+         
+        }
+
+        public JsonResult? Validate(DateTime StartDate, DateTime? CancelDate)
+        {
+            if (!ModelState.IsValid)
+            {
+                var invalidValues = ModelState
+                    .Values
+                    .Where((value) => value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid);
+                string invalidFields = "";
+
+                foreach (var invalidValue in ModelState)
+                {
+                    if (invalidValue.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                    {
+                        invalidFields += invalidValue.Key + ", ";
+                    }
+                }
+
+                return FormResult.CreateErrorResult($"Check fields: {invalidFields}");
+            }
+
+            if (StartDate > CancelDate)
+            {
+                return FormResult.CreateErrorResult("Start time and end time. Start time cannot be greater than End time");
+            }
+
+            return null;
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

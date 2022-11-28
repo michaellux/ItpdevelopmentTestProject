@@ -138,7 +138,8 @@
 </script>
 
 <script type="text/template" id="vue-task-template">
-    <tr>
+    
+    <tr class="position-relative">
         <td>
             {{task.order}}
         </td>
@@ -158,9 +159,11 @@
         </td>
         <td v-if="task.CancelDate">
             {{task.EndTime}}
+             <a class="stretched-link" :href="'/Home/Task?id=' + task.Id"></a>
         </td>
         <td v-else>
             00:00
+             <a class="stretched-link" :href="'/Home/Task?id=' + task.Id"></a>
         </td>
     </tr>
 </script>
