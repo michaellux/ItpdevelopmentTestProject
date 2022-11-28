@@ -106,22 +106,26 @@ namespace ItpdevelopmentTestProject.Controllers
             if (id != null)
             {
                 var projects = db.Projects.Include(project => project.Tasks);
+                var tasks = db.Tasks.Include(task => task.TaskComments);
 
                 ItpdevelopmentTestProject.Models.Task? task = await db.Tasks.Include(tasks => tasks.TaskComments).Include(tasks => tasks.Project).FirstOrDefaultAsync(p => p.Id == id);
-                var tupleModel = new Tuple<IEnumerable<Project>, ItpdevelopmentTestProject.Models.Task?>(projects, task);
+                var tupleModel = new Tuple<IEnumerable<Project>, ItpdevelopmentTestProject.Models.Task?, IEnumerable<ItpdevelopmentTestProject.Models.Task?>>(projects, task, tasks);
                 if (task != null) return View(tupleModel);
             }
             return NotFound();
         }
 
         [HttpPost]
-        public IActionResult EditTaskForm(Task task, string[]? TextContent)
+        public IActionResult EditTaskForm(Guid Id, string Name, string Project, DateTime StartDate,
+            DateTime? CancelDate, string[]? TextContent)
         {
-            if (task.StartDate > task.CancelDate)
+
+
+            if (StartDate > CancelDate)
             {
                 return FormResult.CreateErrorResult("Start time and end time. Start time cannot be greater than End time");
             }
-            if (string.IsNullOrEmpty(task.TaskName))
+            if (string.IsNullOrEmpty(Name))
             {
                 return FormResult.CreateErrorResult("Name is empty");
             }
@@ -143,7 +147,7 @@ namespace ItpdevelopmentTestProject.Controllers
             }
             try
             {
-                ItpdevelopmentTestProject.Models.Task.Update(db, task, TextContent, FileContent);
+                ItpdevelopmentTestProject.Models.Task.Update(db, Id, Name, Project, StartDate, CancelDate, TextContent, FileContent);
                 return FormResult.CreateSuccessResult("Task created.");
             }
             catch (Exception e)

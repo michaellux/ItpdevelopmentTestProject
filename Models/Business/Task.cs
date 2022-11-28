@@ -113,11 +113,26 @@ namespace ItpdevelopmentTestProject.Models
         }
 
 
-        internal static async System.Threading.Tasks.Task Update(ItpdevelopmentTestProjectContext context, Task task,  string[]? TextContent, List<byte[]>? FileContent)
+        internal static async System.Threading.Tasks.Task Update(ItpdevelopmentTestProjectContext context, Guid id, string Name, string Project, DateTime StartDate,
+            DateTime? CancelDate, string[]? TextContent, List<byte[]>? FileContent)
         {
-            task.UpdateDate = DateTime.UtcNow;
-            context.Tasks.Update(task);
-            await context.SaveChangesAsync();
+
+
+            using (context)
+            {
+                Task? task = context.Tasks.FirstOrDefault(task => task.Id == id);
+
+                if (task != null)
+                {
+                    task.TaskName = Name;
+                    task.ProjectId = new Guid(Project);
+                    task.StartDate = StartDate;
+                    task.CancelDate = CancelDate;
+                    task.UpdateDate = DateTime.UtcNow;
+                }
+
+                context.SaveChanges();
+            }
         }
 
     }

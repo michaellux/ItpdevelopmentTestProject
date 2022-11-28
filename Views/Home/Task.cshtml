@@ -1,4 +1,4 @@
-﻿@model Tuple<IEnumerable<Project>, ItpdevelopmentTestProject.Models.Task>
+﻿@model Tuple<IEnumerable<Project>, ItpdevelopmentTestProject.Models.Task, IEnumerable<ItpdevelopmentTestProject.Models.Task>>
 
 @{
     ViewData["Title"] = "Task";
@@ -21,12 +21,12 @@
                 <input type="hidden" asp-for="@task.Id"/>
                 <div class="mb-3">
                     @Html.Label("Name", "Name", new { @class= "form-label" })
-                    <input class="form-control" asp-for="@task.TaskName" />
+                    <input class="form-control" name="Name" value="@task.TaskName"/>
                 </div>
                 <div class="mb-3">
                     @Html.Label("Project", "Project", new { @class= "form-label" })
 
-                    <select asp-for="@task.ProjectId" class="form-control">
+                    <select name="Project" class="form-control">
                         <option value="" disabled>Select your option</option>
                         @foreach (var project in projectModel)
                         {
@@ -43,11 +43,10 @@
                 </div>
                 <div class="mb-3">
                     @Html.Label("StartTime", "Start time", new { @class= "form-label" })
-                    <input class="form-control" asp-for="@task.StartDate" />
-                </div>
+                    @Html.EditorFor(Model => Model.Item3.FirstOrDefault((item) => item.Id == task.Id).StartDate, new { htmlAttributes = new { @class = "form-control" }})
                 <div class="mb-3">
                     @Html.Label("EndTime", "End time", new { @class= "form-label" })
-                    <input class="form-control" asp-for="@task.CancelDate" />
+                    @Html.EditorFor(Model => Model.Item3.FirstOrDefault((item) => item.Id == task.Id).CancelDate, new { htmlAttributes = new { @class = "form-control" }})
                 </div>
                 <div class="mb-3">
                     <label class="form-label">@ViewData["Description"]</label>
