@@ -26,23 +26,6 @@ namespace ItpdevelopmentTestProject.Models
             }
         }
 
-        //public string TotalSpentTime(ItpdevelopmentTestProjectContext context)
-        //{
-
-        //    var tasks = context.Tasks;
-
-        //    List<TimeSpan> periods = new();
-
-        //    foreach (var task in tasks)
-        //    {
-        //        periods.Add(task.Period);
-        //    }
-
-        //    TimeSpan total = periods.Aggregate(TimeSpan.Zero, (subtotal, t) => subtotal.Add(t))
-
-        //    return 
-        //}
-
         public string StartTime
         {
             get

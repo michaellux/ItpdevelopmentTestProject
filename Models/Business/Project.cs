@@ -26,8 +26,8 @@
                 {
                     Id = projectGuid,
                     ProjectName = projectName,
-                    CreateDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow
+                    CreateDate = DateTime.Now,
+                    UpdateDate = DateTime.Now
                 }
             );
 

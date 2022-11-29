@@ -32,6 +32,8 @@
                 page: 1,
                 perPage: 2,
                 project: null,
+                newStartDate: null,
+                newEndDate: null,
             }
         },
         mounted() {
@@ -40,15 +42,58 @@
             });
         },
         computed: {
-            displayedRecords() {
-                const startIndex = this.perPage * (this.page - 1);
-                const endIndex = startIndex + this.perPage;
+            displayedRecords: {
+                get()
+                {
+                    const startIndex = this.perPage * (this.page - 1);
+                    const endIndex = startIndex + this.perPage;
 
-                let tasks = this.project.Tasks;
+                    let tasks = this.project.Tasks;
 
-                tasks = tasks.map((obj, order) => ({ ...obj, order: ++order }));
+                    tasks = tasks.map((obj, order) => ({ ...obj, order: ++order }));
 
-                return tasks.slice(startIndex, endIndex);
+                    tasks = tasks.filter((task) => {
+                        let startDateTask = new Date(task.StartDate.substring(0, 10)).getTime();
+                        let endDateTask = new Date(task.CancelDate.substring(0,10)).getTime();
+
+                        this.newStartDate = this.newStartDate ?? new Date(this.initStartDate).getTime();
+                        this.newEndDate = this.newEndDate ?? new Date(this.initEndDate).getTime();
+                        console.log(startDateTask);
+                        console.log(endDateTask);
+                        return ( (this.newStartDate <= startDateTask) && (this.newEndDate >= endDateTask) )
+                    });
+
+                    return tasks.slice(startIndex, endIndex);
+                },
+                set(value)
+                {
+                    return 0;
+                }
+             
+            },
+            initStartDate: {
+                get() {
+                    let startDate = Math.min(
+                        ...this.project.Tasks.map(element => {
+                            return new Date(element.StartDate);
+                        }));
+                    return new Date(startDate).toISOString().substring(0,10);
+                },
+                set(value) {
+                    this.newStartDate = new Date(value).getTime();
+                }
+            },
+            initEndDate: {
+                get() {
+                    let endDate = Math.max(
+                        ...this.project.Tasks.map(element => {
+                            return new Date(element.CancelDate);
+                        }));
+                    return new Date(endDate).toISOString().substring(0, 10);
+                },
+                set(value) {
+                    this.newEndDate = new Date(value).getTime();
+                }
             }
         },
         methods: {
@@ -60,6 +105,9 @@
             },
             callback: function (page) {
                 // no need for callback here since you have all your data loaded already
+            },
+            filter: function () {
+                this.displayedRecords = 0;
             }
         },
         template: '#vue-project-template'
@@ -98,18 +146,18 @@
         <p class="created">Created: {{project.CreateDateTime}}</p>
         <p class="updated">Updated: {{project.UpdateDateTime}}</p>
 
-        <form asp-formhelper="true" asp-controller="Home" asp-action="Index" method="post">
+        <form>
               <div class="form-row">
                     <div class="col-3">
                         <label class="form-label">Start date</label>
-                        <input type="datetime-local" id="StartDate" name="StartDate" class="startDate form-control" />
+                        <input v-model="initStartDate" type="date" id="StartDate" name="StartDate" class="startDate form-control" />
                     </div>
                     <div class="col-3">
                         <label class="form-label">End date</label>
-                        <input type="datetime-local" id="EndDate" name="EndDate" class="endDate form-control" />
+                        <input v-model="initEndDate" type="date" id="EndDate" name="EndDate" class="endDate form-control" />
                     </div>
                     <div class="col-3">
-                       <input type="submit" value="Filter" class="btn btn-primary" />
+                       <input v-on:click="filter" type="button" value="Filter" class="btn btn-primary" />
                     </div>
               </div>
         </form>

@@ -57,7 +57,7 @@ namespace ItpdevelopmentTestProject.Controllers
             var projects = db.Projects.Include(project => project.Tasks);
             var tasks = db.Tasks.Include(task => task.TaskComments)
                 .Where(task => task.StartDate >= StartDate)
-                .Where(task => task.CancelDate <= (CancelDate ?? DateTime.UtcNow));
+                .Where(task => task.CancelDate <= (CancelDate ?? DateTime.Now));
 
             var tupleModel = new Tuple<IEnumerable<Project>, IEnumerable<Task>>(projects, tasks);
 
