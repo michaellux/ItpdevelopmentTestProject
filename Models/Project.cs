@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -6,6 +7,7 @@ namespace ItpdevelopmentTestProject.Models;
 
 public partial class Project
 {
+    [BindProperty]
     public Guid Id { get; set; }
     public string ProjectName { get; set; } = null!;
 

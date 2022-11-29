@@ -1,4 +1,4 @@
-﻿@model Tuple<IEnumerable<Project>, IEnumerable<ItpdevelopmentTestProject.Models.Task>>
+﻿@model Tuple<IEnumerable<Project>, IEnumerable<ItpdevelopmentTestProject.Models.Task>, IEnumerable<Project>>
 @{
     ViewData["Title"] = "Projects";
     ViewData["Number in order"] = "#";
@@ -96,7 +96,23 @@
      <section class="project">
         <h2 v-if="id">{{project.ProjectName}}</h2>
         <p class="created">Created: {{project.CreateDateTime}}</p>
-         <p class="updated">Updated: {{project.UpdateDateTime}}</p>
+        <p class="updated">Updated: {{project.UpdateDateTime}}</p>
+
+        <form asp-formhelper="true" asp-controller="Home" asp-action="Index" method="post">
+              <div class="form-row">
+                    <div class="col-3">
+                        <label class="form-label">Start date</label>
+                        <input type="datetime-local" id="StartDate" name="StartDate" class="startDate form-control" />
+                    </div>
+                    <div class="col-3">
+                        <label class="form-label">End date</label>
+                        <input type="datetime-local" id="EndDate" name="EndDate" class="endDate form-control" />
+                    </div>
+                    <div class="col-3">
+                       <input type="submit" value="Filter" class="btn btn-primary" />
+                    </div>
+              </div>
+        </form>
 
         @{
             var task = projectModel.First().Tasks.First();

@@ -20,14 +20,48 @@ namespace ItpdevelopmentTestProject.Controllers
             db = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string? id)
         {
-            var projects = db.Projects.Include(project => project.Tasks);
+            var routeValues = HttpContext.GetRouteData().Values;
+
+            var allProjects = db.Projects.Include(project => project.Tasks);
+
+            var filteredprojects = allProjects.Where(project => project.Id.ToString() == (id ?? project.Id.ToString()));
+
+            var tasks = db.Tasks.Include(task => task.TaskComments);
+
+            var tupleModel = new Tuple<IEnumerable<Project>, IEnumerable<Task>, IEnumerable<Project>>(allProjects, tasks, filteredprojects);
+
+            ViewData["Id"] = id;
+
+            return View(tupleModel);
+        }
+
+
+        public IActionResult FilterProjects(Guid? Id)
+        {
+            var projects = db.Projects
+                .Where(project => project.Id == (Id ?? project.Id))
+                .Include(project => project.Tasks);
             var tasks = db.Tasks.Include(task => task.TaskComments);
 
             var tupleModel = new Tuple<IEnumerable<Project>, IEnumerable<Task>>(projects, tasks);
 
-            return View(tupleModel);
+            FormResult.CreateSuccessResult("Projects filtered");
+
+            return RedirectToAction("Index", new {id = Id.ToString() });
+        }
+
+        public IActionResult FilterTasks(DateTime StartDate, DateTime? CancelDate)
+        {
+            var projects = db.Projects.Include(project => project.Tasks);
+            var tasks = db.Tasks.Include(task => task.TaskComments)
+                .Where(task => task.StartDate >= StartDate)
+                .Where(task => task.CancelDate <= (CancelDate ?? DateTime.UtcNow));
+
+            var tupleModel = new Tuple<IEnumerable<Project>, IEnumerable<Task>>(projects, tasks);
+
+            return new OkResult();
         }
 
         [HttpGet]
@@ -67,7 +101,11 @@ namespace ItpdevelopmentTestProject.Controllers
         public IActionResult TaskForm(string Name, string Project, DateTime StartDate,
             DateTime? CancelDate, string[]? TextContent)
         {
-            return Validate(StartDate, CancelDate);
+            IActionResult validationResult = Validate(StartDate, CancelDate);
+            if (validationResult is not OkResult)
+            {
+                return validationResult;
+            }
 
             List<byte[]>? FileContent = new();
             IFormFileCollection fileCollection = HttpContext.Request.Form.Files;
@@ -159,7 +197,7 @@ namespace ItpdevelopmentTestProject.Controllers
          
         }
 
-        public JsonResult? Validate(DateTime StartDate, DateTime? CancelDate)
+        public IActionResult Validate(DateTime StartDate, DateTime? CancelDate)
         {
             if (!ModelState.IsValid)
             {
@@ -184,7 +222,7 @@ namespace ItpdevelopmentTestProject.Controllers
                 return FormResult.CreateErrorResult("Start time and end time. Start time cannot be greater than End time");
             }
 
-            return null;
+            return new OkResult();
         }
 
 

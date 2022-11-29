@@ -1,7 +1,9 @@
-﻿@model Tuple<IEnumerable<Project>, IEnumerable<ItpdevelopmentTestProject.Models.Task>>
-
+﻿@model Tuple<IEnumerable<Project>, IEnumerable<ItpdevelopmentTestProject.Models.Task>, IEnumerable<Project>>
+@using FormHelper
+@addTagHelper *, FormHelper
 @{
     ViewData["Title"] = "Projects";
+    ViewData["FilterButton"] = "Filter";
     ViewData["CreateProject"] = "Create project";
     ViewData["CreateTask"] = "Create task";
     ViewData["CreateButton"] = "Create";
@@ -9,6 +11,8 @@
 
     var projectModel = Model.Item1;
     var taskModel = Model.Item2;
+    var filteredProjectsModel = Model.Item3;
+    var filteredProject = filteredProjectsModel.First();
 }
 
 <div id="app" class="project pt-4">
@@ -20,7 +24,35 @@
     <button type="button" class="btn btn-primary main__create" data-bs-toggle="modal" data-bs-target="#createTaskModal">
         @ViewData["CreateTask"]
     </button>
-    @foreach (var project in projectModel)
+    <form class="mb-3" asp-controller="Home" asp-action="FilterProjects" method="post">
+        <div class="form-row">
+            <div class="col-3">
+                <label class="form-label">Project</label>
+                <select name="Id" class="form-control">
+                    @{
+                        var conditionAllSelected = @ViewData["id"] == null;
+                    }
+                    <option value="" selected="@conditionAllSelected">All</option>
+                    @foreach (var project in projectModel)
+                    {
+                        var conditionProjectSelected = project.Id == filteredProject.Id;
+
+                        if (conditionAllSelected) {
+                             <option value="@project.Id">@project.ProjectName</option>
+                        }
+                        else {
+                             <option value="@project.Id" selected="@conditionProjectSelected">@project.ProjectName</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col">
+                <button class="btn btn-primary">@ViewData["FilterButton"]</button>
+            </div>
+        </div>
+    </form>
+
+    @foreach (var project in filteredProjectsModel)
     {
         
         List<TimeSpan> periods = new();
