@@ -98,7 +98,8 @@ namespace ItpdevelopmentTestProject.Controllers
             return Json(tasks);
         }
 
-        public IActionResult TaskForm(string Name, string Project, DateTime StartDate,
+        [HttpPost]
+        public IActionResult Index(string Name, string Project, DateTime StartDate,
             DateTime? CancelDate, string[]? TextContent)
         {
             IActionResult validationResult = Validate(StartDate, CancelDate);
@@ -123,6 +124,8 @@ namespace ItpdevelopmentTestProject.Controllers
             }
 
             ItpdevelopmentTestProject.Models.Task.Create(db, Name, Project, StartDate, CancelDate, TextContent, FileContent);
+
+            //return Json(new { });
 
             return FormResult.CreateSuccessResult("Task created.");
         }

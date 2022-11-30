@@ -42,3 +42,7 @@ body {
     flex-wrap: wrap;
     align-items: end;
 }
+
+.updated {
+    margin-bottom: 0;
+}

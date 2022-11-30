@@ -38,24 +38,7 @@
             }
         },
         mounted() {
-            
-            this.getProject(this.id).then((data) => {
-               this.project = data;
-
-                let startDate = Math.min(
-                    ...this.project.Tasks.map(element => {
-                        return new Date(element.StartDate);
-                    }));
-                this.newStartDate = new Date(startDate).toISOString().substring(0, 10);
-                //return valueForInput;
-
-                let endDate = Math.max(
-                    ...this.project.Tasks.map(element => {
-                        return new Date(element.CancelDate);
-                    }));
-                this.newEndDate = new Date(endDate).toISOString().substring(0, 10);
-                //return valueForInput;
-            });
+            this.update();
         },
         computed: {
             displayedRecords: {
@@ -98,6 +81,27 @@
             },
         },
         methods: {
+            update()
+            {
+                this.getProject(this.id).then((data) => {
+                    this.project = data;
+
+                    let startDate = Math.min(
+                        ...this.project.Tasks.map(element => {
+                            return new Date(element.StartDate);
+                        }));
+                    this.newStartDate = new Date(startDate).toISOString().substring(0, 10);
+                    //return valueForInput;
+
+                    let endDate = Math.max(
+                        ...this.project.Tasks.map(element => {
+                            return new Date(element.CancelDate);
+                        }));
+                    this.newEndDate = new Date(endDate).toISOString().substring(0, 10);
+                    //return valueForInput;
+                });
+            },
+
             async getProject(id)
             {
                 const res = await fetch('/Home/GetProject?id=' + id);
@@ -143,6 +147,7 @@
         <h2 v-if="id">{{project.ProjectName}}</h2>
         <p class="created">Created: {{project.CreateDateTime}}</p>
         <p class="updated">Updated: {{project.UpdateDateTime}}</p>
+        <p class="total">Total time: {{total}}</p>
 
         <form>
               <div class="form-row">
@@ -190,7 +195,6 @@
             
         </tbody>
     </table>
-    <p>Total time: {{total}}</p>
       <pagination :records="filteredTasksAmount" v-model="page" :per-page="perPage">
               </pagination>
      </section>

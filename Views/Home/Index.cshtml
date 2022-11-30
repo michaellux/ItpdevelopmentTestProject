@@ -63,12 +63,12 @@
         }
 
         TimeSpan totalPeriod = periods.Aggregate(TimeSpan.Zero, (subtotal, t) => subtotal.Add(t));
-        string final = string.Format("{0:hh\\:mm}", totalPeriod);
+        string final = string.Format("{0:dd\\.hh\\:mm\\:ss} days", totalPeriod);
       
      
 
         var name = project.ProjectName;
-        <vue-project class="mb-4" id="@project.Id" total="@final">
+        <vue-project class="mb-4" id="@project.Id" total="@final" ref="project">
                 
         </vue-project>
     }
@@ -86,7 +86,7 @@
             </div>
             <div class="modal-body">
                 <div asp-validation-summary="ModelOnly"></div>
-                <form enctype="multipart/form-data" asp-formhelper="true" asp-controller="Home" asp-action="TaskForm">
+                <form asp-callback="CallBack" enctype="multipart/form-data" asp-formhelper="true" asp-controller="Home" asp-action="Index">
                     <div class="mb-3">
                         @Html.Label("Name", "Name", new { @class= "form-label" })
                         @Html.TextBox("Name","", new { type="text", @class="form-control" })
@@ -189,5 +189,12 @@
         var app = new Vue({
             el: '#app'
         })
+
+        function CallBack(response) {
+            if (response.isSucceed)
+            {
+                app.$refs.project.update();
+            }
+        }
     </script>
 }
