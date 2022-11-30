@@ -34,11 +34,27 @@
                 project: null,
                 newStartDate: null,
                 newEndDate: null,
+                filteredTasksAmount: null
             }
         },
         mounted() {
+            
             this.getProject(this.id).then((data) => {
                this.project = data;
+
+                let startDate = Math.min(
+                    ...this.project.Tasks.map(element => {
+                        return new Date(element.StartDate);
+                    }));
+                this.newStartDate = new Date(startDate).toISOString().substring(0, 10);
+                //return valueForInput;
+
+                let endDate = Math.max(
+                    ...this.project.Tasks.map(element => {
+                        return new Date(element.CancelDate);
+                    }));
+                this.newEndDate = new Date(endDate).toISOString().substring(0, 10);
+                //return valueForInput;
             });
         },
         computed: {
@@ -53,48 +69,33 @@
                     tasks = tasks.map((obj, order) => ({ ...obj, order: ++order }));
 
                     tasks = tasks.filter((task) => {
-                        let startDateTask = new Date(task.StartDate.substring(0, 10)).getTime();
-                        let endDateTask = new Date(task.CancelDate.substring(0,10)).getTime();
+                        let newStartDate = new Date(this.newStartDate).getTime();
+                        let newEndDate = new Date(this.newEndDate).getTime();
 
-                        this.newStartDate = this.newStartDate ?? new Date(this.initStartDate).getTime();
-                        this.newEndDate = this.newEndDate ?? new Date(this.initEndDate).getTime();
+                        let startDateTask = new Date(task.StartDate.substring(0, 10)).getTime();
+                        let endDateTask = new Date( task.CancelDate == null ? this.newEndDate : task.CancelDate.substring(0,10) ).getTime();
+
+
                         console.log(startDateTask);
                         console.log(endDateTask);
-                        return ( (this.newStartDate <= startDateTask) && (this.newEndDate >= endDateTask) )
+
+                        if ((newStartDate > newEndDate) || (isNaN(newStartDate)) ) {
+                            this.newStartDate = this.newEndDate;
+                        }
+                        if ( (newEndDate < newStartDate) || (isNaN(newEndDate)) )
+                        {
+                            this.newEndDate = this.newStartDate;
+                        }
+
+
+                        return ( (newStartDate <= startDateTask) && (newEndDate >= endDateTask) )
                     });
 
+                    this.filteredTasksAmount = tasks.length;
+
                     return tasks.slice(startIndex, endIndex);
-                },
-                set(value)
-                {
-                    return 0;
-                }
-             
+                },             
             },
-            initStartDate: {
-                get() {
-                    let startDate = Math.min(
-                        ...this.project.Tasks.map(element => {
-                            return new Date(element.StartDate);
-                        }));
-                    return new Date(startDate).toISOString().substring(0,10);
-                },
-                set(value) {
-                    this.newStartDate = new Date(value).getTime();
-                }
-            },
-            initEndDate: {
-                get() {
-                    let endDate = Math.max(
-                        ...this.project.Tasks.map(element => {
-                            return new Date(element.CancelDate);
-                        }));
-                    return new Date(endDate).toISOString().substring(0, 10);
-                },
-                set(value) {
-                    this.newEndDate = new Date(value).getTime();
-                }
-            }
         },
         methods: {
             async getProject(id)
@@ -106,9 +107,6 @@
             callback: function (page) {
                 // no need for callback here since you have all your data loaded already
             },
-            filter: function () {
-                this.displayedRecords = 0;
-            }
         },
         template: '#vue-project-template'
     });
@@ -150,14 +148,11 @@
               <div class="form-row">
                     <div class="col-3">
                         <label class="form-label">Start date</label>
-                        <input v-model="initStartDate" type="date" id="StartDate" name="StartDate" class="startDate form-control" />
+                        <input v-model="newStartDate" type="date" id="StartDate" name="StartDate" class="startDate form-control" />
                     </div>
                     <div class="col-3">
                         <label class="form-label">End date</label>
-                        <input v-model="initEndDate" type="date" id="EndDate" name="EndDate" class="endDate form-control" />
-                    </div>
-                    <div class="col-3">
-                       <input v-on:click="filter" type="button" value="Filter" class="btn btn-primary" />
+                        <input v-model="newEndDate" type="date" id="EndDate" name="EndDate" class="endDate form-control" />
                     </div>
               </div>
         </form>
@@ -196,7 +191,7 @@
         </tbody>
     </table>
     <p>Total time: {{total}}</p>
-      <pagination :records="project.Tasks.length" v-model="page" :per-page="perPage">
+      <pagination :records="filteredTasksAmount" v-model="page" :per-page="perPage">
               </pagination>
      </section>
 </script>
