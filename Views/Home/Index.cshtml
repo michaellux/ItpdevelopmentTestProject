@@ -17,7 +17,6 @@
 
 <div id="app" class="project pt-4">
     <h1 class="display-4 main__title">@ViewData["Title"]</h1>
-
     <button type="button" class="btn btn-info main__create" data-bs-toggle="modal" data-bs-target="#createProjectModal">
         @ViewData["CreateProject"]
     </button>
@@ -52,10 +51,17 @@
         </div>
     </form>
 
-    @foreach (var project in filteredProjectsModel)
-    {
+@*    <vue-project class="mb-4" id="4" total="34" ref="project">
+
+    </vue-project>*@
+
+
+
+
+@*    @foreach (var project in filteredProjectsModel)
+    {*@
         
-        List<TimeSpan> periods = new();
+@*        List<TimeSpan> periods = new();
 
         foreach (var item in project.Tasks)
         {
@@ -67,8 +73,8 @@
       
      
 
-        var name = project.ProjectName;
-        <vue-project class="mb-4" id="@project.Id" total="@final" ref="project">
+        var name = project.ProjectName;*@
+        <vue-project v-for="project in projects" :id="project" total="34" ref="project">
                 
         </vue-project>
     }
@@ -181,19 +187,40 @@
 </div>
 
 @section Scripts {
+    <script>
+        let projects = [];
+    </script>
 
+
+    @{
+        var index = 0;
+    }
+    @foreach (var project in filteredProjectsModel)
+    {
+        <script>
+            projects = [...projects, "@project.Id"];
+            localStorage.setItem(@index.ToString(), "@project.Id");
+        </script>
+        index++;
+    }
 
     <partial name="_Project" />
 
     <script type="text/javascript">
         var app = new Vue({
-            el: '#app'
+            el: '#app',
+            props: {
+                projects: null
+            },
+            mounted() {
+                this.projects = projects
+            }
         })
 
         function CallBack(response) {
             if (response.isSucceed)
             {
-                app.$refs.project.update();
+                app.$refs.project.forEach(item => item.update());
             }
         }
     </script>
