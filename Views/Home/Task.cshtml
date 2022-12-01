@@ -11,17 +11,15 @@
 }
 
 <h1 class="display-4 main__title">@ViewData["Title"]</h1>
-
 <div class="container">
     <div class="row">
         <div class="col-6">
-
             <div asp-validation-summary="ModelOnly"></div>
             <form enctype="multipart/form-data" asp-formhelper="true" asp-route-id="@task.Id" asp-controller="Home" asp-action="EditTaskForm">
-                <input type="hidden" asp-for="@task.Id"/>
+                <input type="hidden" asp-for="@task.Id" />
                 <div class="mb-3">
                     @Html.Label("Name", "Name", new { @class= "form-label" })
-                    <input class="form-control" name="Name" value="@task.TaskName"/>
+                    <input class="form-control" name="Name" value="@task.TaskName" />
                 </div>
                 <div class="mb-3">
                     @Html.Label("Project", "Project", new { @class= "form-label" })
@@ -44,24 +42,67 @@
                 <div class="mb-3">
                     @Html.Label("StartTime", "Start time", new { @class= "form-label" })
                     @Html.EditorFor(Model => Model.Item3.FirstOrDefault((item) => item.Id == task.Id).StartDate, new { htmlAttributes = new { @class = "form-control" }})
-                <div class="mb-3">
-                    @Html.Label("EndTime", "End time", new { @class= "form-label" })
-                    @Html.EditorFor(Model => Model.Item3.FirstOrDefault((item) => item.Id == task.Id).CancelDate, new { htmlAttributes = new { @class = "form-control" }})
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">@ViewData["Description"]</label>
-                    <div id="createDescriptionFieldButtons">
-                        <input value="Add text" type="button" id="createTextDescriptionField" class="btn btn-outline-secondary btn-sm" />
-                        <input value="Add file" type="button" id="createFileField" class="btn btn-outline-secondary btn-sm" />
+                    <div class="mb-3">
+                        @Html.Label("EndTime", "End time", new { @class= "form-label" })
+                        @Html.EditorFor(Model => Model.Item3.FirstOrDefault((item) => item.Id == task.Id).CancelDate, new { htmlAttributes = new { @class = "form-control" }})
                     </div>
-                    <div id="descriptions-block">
-                        @foreach (var comment in task.TaskComments)
-                        {
-                            if (comment.CommentType == (int)CommentTypes.Text)
+                    <div class="mb-3">
+                        <label class="form-label">@ViewData["Description"]</label>
+                        <div id="createDescriptionFieldButtons">
+                            <input value="Add text" type="button" id="createTextDescriptionField" class="btn btn-outline-secondary btn-sm" />
+                            <input value="Add file" type="button" id="createFileField" class="btn btn-outline-secondary btn-sm" />
+                        </div>
+                        <div id="descriptions-block"></div>
+                        <script>
+                            let descriptionFieldBlock = document.getElementById("descriptions-block");
+                            const createDescriptionBlock = () => {
+                                let descriptionField = document.createElement("input");
+                                descriptionField.classList.add('mt-3');
+                                descriptionField.classList.add('mb-3');
+                                descriptionField.classList.add('form-control');
+
+                                return descriptionField;
+                            }
+
+                            document.getElementById("createTextDescriptionField").addEventListener("click", function () {
+                                let descriptionField = createDescriptionBlock();
+                                descriptionField.classList.add('description__textfield');
+                                let textDescriptionFieldCount = document.getElementsByClassName("description__textfield").length;
+                                descriptionField.setAttribute('name', `TextContent`);
+                                descriptionFieldBlock.prepend(descriptionField);
+
+                            });
+
+                            document.getElementById("createFileField").addEventListener("click", function () {
+                                let descriptionField = createDescriptionBlock();
+                                descriptionField.setAttribute('type', 'file');
+                                descriptionField.classList.add('description__filefield');
+                                let textDescriptionFieldCount = document.getElementsByClassName("description__filefield").length;
+                                descriptionField.setAttribute('name', `FileContent[${textDescriptionFieldCount}]`);
+                                descriptionFieldBlock.prepend(descriptionField);
+                            });
+                        </script>
+                    </div>
+                    <p>
+                        <button class="btn btn-primary btn-lg">@ViewData["SaveButton"]</button>
+                    </p>
+                </div>
+            </form>
+
+        </div>
+        <div class="col-6">
+            @foreach (var comment in task.TaskComments)
+            {
+                <div asp-validation-summary="None"></div>
+                <form asp-formhelper="true" asp-beforeSubmit="BeforeSubmit" asp-route-id="@task.Id" asp-controller="Home" asp-action="EditTaskDescriptionsForm">
+                    <div id="descriptions-block mb-3">
+                        <label class="mb-2">Descriptions:</label>
+
+                            @if (comment.CommentType == (int)CommentTypes.Text)
                             {
-                                <div class="input-group mb-3 mt-3">
+                                <div class="input-group mb-3">
                                     <input asp-for="@comment.Content" class="form-control description__textfield" value="@System.Text.Encoding.UTF8.GetString(comment.Content)" name="TextContent[@comment.Id]" />
-                                    <button class="btn btn-danger">@ViewData["RemoveButton"]</button>
+                                    <button name="button" class="btn btn-danger">@ViewData["RemoveButton"]</button>
                                 </div>
 
 
@@ -69,50 +110,33 @@
                             }
                             else if (comment.CommentType == (int)CommentTypes.File)
                             {
-                                <div class="input-group mb-3  mt-3">
+                                <div class="input-group mb-3">
 
-                                    <a class="form-control" href="@comment.Description">Attachment</a>
-                                    <button class="btn btn-danger">@ViewData["RemoveButton"]</button>
+                                    <a class="form-control" href="@comment.Description" name="FileContent[@comment.Id]">Attachment</a>
+                                    <button name="button" class="btn btn-danger">@ViewData["RemoveButton"]</button>
                                 </div>
                             }
-                        }
+                    
                     </div>
-                    <script>
-                        let descriptionFieldBlock = document.getElementById("descriptions-block");
-                        const createDescriptionBlock = () => {
-                            let descriptionField = document.createElement("input");
-                            descriptionField.classList.add('mt-3');
-                            descriptionField.classList.add('mb-3');
-                            descriptionField.classList.add('form-control');
-
-                            return descriptionField;
-                        }
-
-                        document.getElementById("createTextDescriptionField").addEventListener("click", function () {
-                            let descriptionField = createDescriptionBlock();
-                            descriptionField.classList.add('description__textfield');
-                            let textDescriptionFieldCount = document.getElementsByClassName("description__textfield").length;
-                            descriptionField.setAttribute('name', `TextContent[${textDescriptionFieldCount}]`);
-                            descriptionFieldBlock.prepend(descriptionField);
-
-                        });
-
-                        document.getElementById("createFileField").addEventListener("click", function () {
-                            let descriptionField = createDescriptionBlock();
-                            descriptionField.setAttribute('type', 'file');
-                            descriptionField.classList.add('description__filefield');
-                            let textDescriptionFieldCount = document.getElementsByClassName("description__filefield").length;
-                            descriptionField.setAttribute('name', `FileContent[${textDescriptionFieldCount}]`);
-                            descriptionFieldBlock.prepend(descriptionField);
-                        });
-                    </script>
-                </div>
-                <p>
-                    <button class="btn btn-primary btn-lg">@ViewData["SaveButton"]</button>
-                </p>
-            </form>
+                </form>
+             }
         </div>
     </div>
-
 </div>
+
+@section Scripts {
+
+    <script type="text/javascript">
+        function BeforeSubmit(context) {
+            console.log(context);
+        }
+    </script>
+}
+
+
+
+           
+           
+
+
 

@@ -99,8 +99,6 @@ namespace ItpdevelopmentTestProject.Models
         internal static async System.Threading.Tasks.Task Update(ItpdevelopmentTestProjectContext context, Guid id, string Name, string Project, DateTime StartDate,
             DateTime? CancelDate, string[]? TextContent, List<byte[]>? FileContent)
         {
-
-
             using (context)
             {
                 Task? task = context.Tasks.FirstOrDefault(task => task.Id == id);
@@ -112,6 +110,38 @@ namespace ItpdevelopmentTestProject.Models
                     task.StartDate = StartDate;
                     task.CancelDate = CancelDate;
                     task.UpdateDate = DateTime.UtcNow;
+                }
+
+                if (TextContent != null)
+                {
+                    foreach (var item in TextContent)
+                    {
+                        context.TaskComments.Add(
+                            new TaskComment
+                            {
+                                Id = Guid.NewGuid(),
+                                TaskId = task.Id,
+                                CommentType = (int)CommentTypes.Text,
+                                Content = Encoding.ASCII.GetBytes(item)
+                            }
+                        );
+                    }
+                }
+
+                if (FileContent != null)
+                {
+                    foreach (var item in FileContent)
+                    {
+                        context.TaskComments.Add(
+                            new TaskComment
+                            {
+                                Id = Guid.NewGuid(),
+                                TaskId = task.Id,
+                                CommentType = (int)CommentTypes.File,
+                                Content = item
+                            }
+                        );
+                    }
                 }
 
                 context.SaveChanges();

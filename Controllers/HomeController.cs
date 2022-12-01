@@ -158,9 +158,11 @@ namespace ItpdevelopmentTestProject.Controllers
 
         [HttpPost]
         public IActionResult EditTaskForm(Guid Id, string Name, string Project, DateTime StartDate,
-            DateTime? CancelDate, string[]? TextContent)
+            DateTime? CancelDate)
         {
 
+            var form = HttpContext.Request.Form;
+            string[]? TextContent = form["TextContent"];
 
             if (StartDate > CancelDate)
             {
@@ -189,15 +191,27 @@ namespace ItpdevelopmentTestProject.Controllers
             try
             {
                 ItpdevelopmentTestProject.Models.Task.Update(db, Id, Name, Project, StartDate, CancelDate, TextContent, FileContent);
-                return FormResult.CreateSuccessResult("Task created.");
+                return FormResult.CreateSuccessResult("Changes saved");
+            }
+            catch (Exception e)
+            {
+                return FormResult.CreateErrorResult($"Problem with save: {e.Message}");
+            }         
+        }
+
+        public IActionResult EditTaskDescriptionsForm()
+        {
+            var form = HttpContext.Request.Form;
+
+            try
+            {
+                //ItpdevelopmentTestProject.Models.Task.Update(db, Id, Name, Project, StartDate, CancelDate, TextContent, FileContent);
+                return FormResult.CreateSuccessResult("Changes saved");
             }
             catch (Exception e)
             {
                 return FormResult.CreateErrorResult($"Problem with save: {e.Message}");
             }
-
-
-         
         }
 
         public IActionResult Validate(DateTime StartDate, DateTime? CancelDate)
