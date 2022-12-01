@@ -91,29 +91,27 @@
 
         </div>
         <div class="col-6">
+             <label class="mb-2">Descriptions:</label>
             @foreach (var comment in task.TaskComments)
             {
-                <div asp-validation-summary="None"></div>
-                <form asp-formhelper="true" asp-beforeSubmit="BeforeSubmit" asp-route-id="@task.Id" asp-controller="Home" asp-action="EditTaskDescriptionsForm">
+                <form>
                     <div id="descriptions-block mb-3">
-                        <label class="mb-2">Descriptions:</label>
-
                             @if (comment.CommentType == (int)CommentTypes.Text)
                             {
-                                <div class="input-group mb-3">
-                                    <input asp-for="@comment.Content" class="form-control description__textfield" value="@System.Text.Encoding.UTF8.GetString(comment.Content)" name="TextContent[@comment.Id]" />
-                                    <button name="button" class="btn btn-danger">@ViewData["RemoveButton"]</button>
-                                </div>
+                            <div id="@comment.Id" class="input-group mb-5">
+                                <input name="@comment.Id" asp-for="@comment.Content" class="form-control description__textfield_edit" value="@System.Text.Encoding.UTF8.GetString(comment.Content)" name="TextContent[@comment.Id]" />
+                                <input name="@comment.Id" onclick="SaveContent(this)" type="button" class="btn btn-primary saveContent" value="@ViewData["SaveButton"]" />
+                                <input name="@comment.Id" onclick="RemoveContent(this)" type="button" class="btn btn-danger removeContent" value="@ViewData["RemoveButton"]" />
+                            </div>
 
 
 
                             }
                             else if (comment.CommentType == (int)CommentTypes.File)
                             {
-                                <div class="input-group mb-3">
-
+                            <div id="@comment.Id" class="input-group mb-5">
                                     <a class="form-control" href="@comment.Description" name="FileContent[@comment.Id]">Attachment</a>
-                                    <button name="button" class="btn btn-danger">@ViewData["RemoveButton"]</button>
+                                    <input name="@comment.Id" onclick="RemoveContent(this)" type="button" class="btn btn-danger removeContent" value="@ViewData["RemoveButton"]" />
                                 </div>
                             }
                     
@@ -127,9 +125,37 @@
 @section Scripts {
 
     <script type="text/javascript">
-        function BeforeSubmit(context) {
-            console.log(context);
-        }
+       function RemoveContent(e) {
+            $.ajax({
+                type: "POST",
+                data: e.name,
+                url: '/Home/RemoveContent',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function(data)
+                {
+                    document.getElementById(e.name).remove();
+                }
+            });
+       }
+
+       function SaveContent(e) {
+            let id = e.name;
+            let value = document.querySelector(`.description__textfield_edit[name="TextContent[${id}]"]`).value;
+
+            $.ajax({
+                type: "POST",
+                data: {
+                        id,
+                        value,
+                      },
+                url: '/Home/SaveContent',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function(data)
+                {
+                    
+                }
+            });
+       }
     </script>
 }
 

@@ -199,6 +199,39 @@ namespace ItpdevelopmentTestProject.Controllers
             }         
         }
 
+        public IActionResult RemoveContent()
+        {
+            var form = HttpContext.Request.Form;
+            var idForRemove = form.Keys.FirstOrDefault();
+
+            try
+            {
+                ItpdevelopmentTestProject.Models.Task.RemoveContent(db, idForRemove);
+                return FormResult.CreateSuccessResult("Changes saved");
+            }
+            catch (Exception e)
+            {
+                return FormResult.CreateErrorResult($"Problem with remove: {e.Message}");
+            } 
+        }
+
+        public IActionResult SaveContent()
+        {
+            var form = HttpContext.Request.Form;
+            var idForEdit = form["id"];
+            var value = form["value"];
+
+            try
+            {
+                ItpdevelopmentTestProject.Models.Task.SaveContent(db, idForEdit, value);
+                return FormResult.CreateSuccessResult("Changes saved");
+            }
+            catch (Exception e)
+            {
+                return FormResult.CreateErrorResult($"Problem with save: {e.Message}");
+            }
+        }
+
         public IActionResult EditTaskDescriptionsForm()
         {
             var form = HttpContext.Request.Form;

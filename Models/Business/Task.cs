@@ -96,7 +96,7 @@ namespace ItpdevelopmentTestProject.Models
         }
 
 
-        internal static async System.Threading.Tasks.Task Update(ItpdevelopmentTestProjectContext context, Guid id, string Name, string Project, DateTime StartDate,
+        public static async System.Threading.Tasks.Task Update(ItpdevelopmentTestProjectContext context, Guid id, string Name, string Project, DateTime StartDate,
             DateTime? CancelDate, string[]? TextContent, List<byte[]>? FileContent)
         {
             using (context)
@@ -148,5 +148,22 @@ namespace ItpdevelopmentTestProject.Models
             }
         }
 
+        public static async System.Threading.Tasks.Task RemoveContent(ItpdevelopmentTestProjectContext context, string id)
+        {
+            TaskComment taskComment = context.TaskComments.FirstOrDefault(taskComment => taskComment.Id == new Guid(id));
+
+            context.TaskComments.Remove(taskComment);
+
+            context.SaveChanges();
+        }
+        
+        public static async System.Threading.Tasks.Task SaveContent(ItpdevelopmentTestProjectContext context, string id, string value)
+        {
+            TaskComment taskComment = context.TaskComments.FirstOrDefault(taskComment => taskComment.Id == new Guid(id));
+
+            taskComment.Content = Encoding.ASCII.GetBytes(value);
+
+            context.SaveChanges();
+        }
     }
 }
