@@ -25,7 +25,6 @@
         },
         props: {
             id: String,
-            total: String
         },
         data() {
             return {
@@ -34,7 +33,8 @@
                 project: null,
                 newStartDate: null,
                 newEndDate: null,
-                filteredTasksAmount: null
+                filteredTasksAmount: null,
+                total: null
             }
         },
         mounted() {
@@ -86,6 +86,11 @@
                 this.getProject(this.id).then((data) => {
                     this.project = data;
 
+                    this.total = this.getTotalTime(this.project.Id).then((data) =>
+                    {
+                        this.total = data;
+                    }
+                    );
                     let startDate = Math.min(
                         ...this.project.Tasks.map(element => {
                             return new Date(element.StartDate);
@@ -107,6 +112,12 @@
                 const res = await fetch('/Home/GetProject?id=' + id);
                 const project = await res.json();
                 return project;
+            },
+            async getTotalTime(id)
+            {
+                const res = await fetch('/Home/GetTotalTime?id=' + id);
+                const final = await res.json();
+                return final;
             },
             callback: function (page) {
                 // no need for callback here since you have all your data loaded already

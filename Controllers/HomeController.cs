@@ -98,6 +98,22 @@ namespace ItpdevelopmentTestProject.Controllers
             return Json(tasks);
         }
 
+        [HttpGet]
+        public JsonResult GetTotalTime(Guid id)
+        {
+            var tasks = db.Projects.Include(project => project.Tasks).FirstOrDefault(item => item.Id == id).Tasks;
+            List<TimeSpan> periods = new();
+
+            foreach (var item in tasks)
+            {
+                periods.Add(item.Period);
+            }
+
+            TimeSpan totalPeriod = periods.Aggregate(TimeSpan.Zero, (subtotal, t) => subtotal.Add(t));
+            string final = string.Format("{0:dd\\.hh\\:mm\\:ss} days", totalPeriod);
+            return Json(final);
+        }
+
         [HttpPost]
         public IActionResult Index(string Name, string Project, DateTime StartDate,
             DateTime? CancelDate, string[]? TextContent)

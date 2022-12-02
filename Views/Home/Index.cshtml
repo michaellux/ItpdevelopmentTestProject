@@ -51,33 +51,18 @@
         </div>
     </form>
 
-@*    <vue-project class="mb-4" id="4" total="34" ref="project">
-
-    </vue-project>*@
-
-
-
-
 @*    @foreach (var project in filteredProjectsModel)
-    {*@
+    {
+
         
-@*        List<TimeSpan> periods = new();
 
-        foreach (var item in project.Tasks)
-        {
-            periods.Add(item.Period);
-        }
 
-        TimeSpan totalPeriod = periods.Aggregate(TimeSpan.Zero, (subtotal, t) => subtotal.Add(t));
-        string final = string.Format("{0:dd\\.hh\\:mm\\:ss} days", totalPeriod);
-      
-     
 
-        var name = project.ProjectName;*@
-        <vue-project v-for="project in projects" :id="project" total="34" ref="project">
+        var name = project.ProjectName;
+    }*@
+        <vue-project v-for="project in projects" :id="project" ref="project">
                 
         </vue-project>
-    }
 </div>
 
 
