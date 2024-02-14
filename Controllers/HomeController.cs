@@ -6,7 +6,7 @@ using MimeDetective;
 using Newtonsoft.Json;
 using Task = ItpdevelopmentTestProject.Models.Task;
 using FormHelper;
-
+using NodaTime;
 namespace ItpdevelopmentTestProject.Controllers
 {
     public class HomeController : Controller
@@ -52,12 +52,12 @@ namespace ItpdevelopmentTestProject.Controllers
             return RedirectToAction("Index", new {id = Id.ToString() });
         }
 
-        public IActionResult FilterTasks(DateTime StartDate, DateTime? CancelDate)
+        public IActionResult FilterTasks(LocalDateTime StartDate, LocalDateTime? CancelDate)
         {
             var projects = db.Projects.Include(project => project.Tasks);
             var tasks = db.Tasks.Include(task => task.TaskComments)
                 .Where(task => task.StartDate >= StartDate)
-                .Where(task => task.CancelDate <= (CancelDate ?? DateTime.Now));
+                .Where(task => task.CancelDate <= (CancelDate ?? LocalDateTime.FromDateTime(DateTime.Now)));
 
             var tupleModel = new Tuple<IEnumerable<Project>, IEnumerable<Task>>(projects, tasks);
 
@@ -102,21 +102,21 @@ namespace ItpdevelopmentTestProject.Controllers
         public JsonResult GetTotalTime(Guid id)
         {
             var tasks = db.Projects.Include(project => project.Tasks).FirstOrDefault(item => item.Id == id).Tasks;
-            List<TimeSpan> periods = new();
+            List<Duration> periods = new List<Duration>();
 
             foreach (var item in tasks)
             {
                 periods.Add(item.Period);
             }
 
-            TimeSpan totalPeriod = periods.Aggregate(TimeSpan.Zero, (subtotal, t) => subtotal.Add(t));
-            string final = string.Format("{0:dd\\.hh\\:mm\\:ss} days", totalPeriod);
+            Duration totalPeriod = periods.Aggregate(Duration.Zero, (subtotal, t) => subtotal + t);
+            string final = string.Format("{0:%d\\.hh\\:mm\\:ss} days", totalPeriod); // Форматирование с использованием NodaTime.Duration
             return Json(final);
         }
 
         [HttpPost]
-        public IActionResult Index(string Name, string Project, DateTime StartDate,
-            DateTime? CancelDate, string[]? TextContent)
+        public IActionResult Index(string Name, string Project, LocalDateTime StartDate,
+            LocalDateTime? CancelDate, string[]? TextContent)
         {
             IActionResult validationResult = Validate(StartDate, CancelDate);
             if (validationResult is not OkResult)
@@ -140,8 +140,6 @@ namespace ItpdevelopmentTestProject.Controllers
             }
 
             ItpdevelopmentTestProject.Models.Task.Create(db, Name, Project, StartDate, CancelDate, TextContent, FileContent);
-
-            //return Json(new { });
 
             return FormResult.CreateSuccessResult("Task created.");
         }
@@ -173,8 +171,8 @@ namespace ItpdevelopmentTestProject.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditTaskForm(Guid Id, string Name, string Project, DateTime StartDate,
-            DateTime? CancelDate)
+        public IActionResult EditTaskForm(Guid Id, string Name, string Project, LocalDateTime StartDate,
+            LocalDateTime? CancelDate)
         {
 
             var form = HttpContext.Request.Form;
@@ -263,7 +261,7 @@ namespace ItpdevelopmentTestProject.Controllers
             }
         }
 
-        public IActionResult Validate(DateTime StartDate, DateTime? CancelDate)
+        public IActionResult Validate(LocalDateTime StartDate, LocalDateTime? CancelDate)
         {
             if (!ModelState.IsValid)
             {

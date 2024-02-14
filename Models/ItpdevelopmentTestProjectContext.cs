@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using NodaTime;
 
 namespace ItpdevelopmentTestProject.Models;
 
@@ -26,8 +27,8 @@ public partial class ItpdevelopmentTestProjectContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Initial Catalog=ItpdevelopmentTestProject");
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        optionsBuilder.UseNpgsql("Host=localhost;port=5432;Database=ItpdevelopmentTestProject;Username=postgres;Password=root;");
         optionsBuilder.EnableSensitiveDataLogging();
     }
 
@@ -100,22 +101,22 @@ public partial class ItpdevelopmentTestProjectContext : DbContext
             {
                 Id = projectGuid1,
                 ProjectName = "Solve solution for X",
-                CreateDate = new DateTime(2012, 3, 12, 12, 4, 0),
-                UpdateDate = new DateTime(2012, 6, 10, 15, 3, 2)
+                CreateDate = new LocalDateTime(2012, 3, 12, 12, 4, 0),
+                UpdateDate = new LocalDateTime(2012, 6, 10, 15, 3, 2)
             },
             new Project
             {
                 Id = projectGuid2,
                 ProjectName = "Buy new tools",
-                CreateDate = new DateTime(2012, 5, 12, 20, 34, 26),
-                UpdateDate = new DateTime(2012, 6, 10, 12, 44, 25)
+                CreateDate = new LocalDateTime(2012, 5, 12, 20, 34, 26),
+                UpdateDate = new LocalDateTime(2012, 6, 10, 12, 44, 25)
             },
             new Project
             {
                 Id = projectGuid3,
                 ProjectName = "Fix update",
-                CreateDate = new DateTime(2012, 9, 12, 20, 34, 26),
-                UpdateDate = new DateTime(2012, 10, 10, 2, 41, 23)
+                CreateDate = new LocalDateTime(2012, 9, 12, 20, 34, 26),
+                UpdateDate = new LocalDateTime(2012, 10, 10, 2, 41, 23)
             }
         );
 
@@ -125,30 +126,30 @@ public partial class ItpdevelopmentTestProjectContext : DbContext
                 Id = taskGuid1,
                 TaskName = "Find the reason",
                 ProjectId = projectGuid1,
-                StartDate = new DateTime(2012, 3, 12, 12, 10, 34),
-                CancelDate = new DateTime(2012, 3, 13, 14, 12, 3),
-                CreateDate = new DateTime(2012, 3, 12, 12, 10, 12),
-                UpdateDate = new DateTime(2012, 3, 13, 14, 12, 3)
+                StartDate = new LocalDateTime(2012, 3, 12, 12, 10, 34),
+                CancelDate = new LocalDateTime(2012, 3, 13, 14, 12, 3),
+                CreateDate = new LocalDateTime(2012, 3, 12, 12, 10, 12),
+                UpdateDate = new LocalDateTime(2012, 3, 13, 14, 12, 3)
             },
             new Task
             {
                 Id = taskGuid2,
                 TaskName = "Buy IDE",
                 ProjectId = projectGuid2,
-                StartDate = new DateTime(2020, 5, 7, 4, 34, 34),
+                StartDate = new LocalDateTime(2020, 5, 7, 4, 34, 34),
                 CancelDate = null,
-                CreateDate = new DateTime(2020, 5, 7, 2, 3, 23),
-                UpdateDate = new DateTime(2020, 5, 7, 4, 34, 34)
+                CreateDate = new LocalDateTime(2020, 5, 7, 2, 3, 23),
+                UpdateDate = new LocalDateTime(2020, 5, 7, 4, 34, 34)
             },
             new Task
             {
                 Id = taskGuid3,
                 TaskName = "Change settings",
                 ProjectId = projectGuid3,
-                StartDate = new DateTime(2022, 11, 22, 23, 44, 0),
-                CancelDate = new DateTime(2022, 11, 23, 13, 0, 45),
-                CreateDate = new DateTime(2022, 11, 22, 20, 33, 43),
-                UpdateDate = new DateTime(2022, 11, 23, 12, 0, 4)
+                StartDate = new LocalDateTime(2022, 11, 22, 23, 44, 0),
+                CancelDate = new LocalDateTime(2022, 11, 23, 13, 0, 45),
+                CreateDate = new LocalDateTime(2022, 11, 22, 20, 33, 43),
+                UpdateDate = new LocalDateTime(2022, 11, 23, 12, 0, 4)
             }
         );
 

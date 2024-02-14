@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NodaTime;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -12,16 +13,22 @@ namespace ItpdevelopmentTestProject.Models
         {
             get
             {
-                TimeSpan diff = (CancelDate == null ? DateTime.UtcNow : CancelDate) - StartDate ?? TimeSpan.Zero;
-                return string.Format("{0:hh\\:mm}", diff);
+                Instant now = SystemClock.Instance.GetCurrentInstant();
+                ZonedDateTime startZonedDateTime = StartDate.InUtc();
+                ZonedDateTime cancelZonedDateTime = CancelDate?.InUtc() ?? now.InUtc();
+                Duration diff = cancelZonedDateTime.ToInstant() - startZonedDateTime.ToInstant();
+                return $"{diff.Hours:00}:{diff.Minutes:00}";
             }
         }
 
-        public TimeSpan Period
+        public Duration Period
         {
             get
             {
-                TimeSpan diff = (CancelDate == null ? DateTime.UtcNow : CancelDate) - StartDate ?? TimeSpan.Zero;
+                Instant now = SystemClock.Instance.GetCurrentInstant();
+                ZonedDateTime startZonedDateTime = StartDate.InUtc();
+                ZonedDateTime cancelZonedDateTime = CancelDate?.InUtc() ?? now.InUtc();
+                Duration diff = cancelZonedDateTime.ToInstant() - startZonedDateTime.ToInstant();
                 return diff;
             }
         }
@@ -42,10 +49,12 @@ namespace ItpdevelopmentTestProject.Models
             }
         }
 
-        public static async System.Threading.Tasks.Task Create(ItpdevelopmentTestProjectContext context, string Name, string Project, DateTime StartDate,
-            DateTime? CancelDate, string[]? TextContent, List<byte[]>? FileContent)
+        public static async System.Threading.Tasks.Task Create(ItpdevelopmentTestProjectContext context, string Name, string Project, LocalDateTime StartDate,
+            LocalDateTime? CancelDate, string[]? TextContent, List<byte[]>? FileContent)
         {
             Guid taskGuid = Guid.NewGuid();
+
+            var now = SystemClock.Instance.GetCurrentInstant().InUtc().WithZone(DateTimeZone.Utc).LocalDateTime;
 
             context.Tasks.Add(
                 new Task
@@ -53,10 +62,10 @@ namespace ItpdevelopmentTestProject.Models
                     Id = taskGuid,
                     TaskName = Name,
                     ProjectId = new Guid(Project),
-                    StartDate = StartDate,
-                    CancelDate = CancelDate,
-                    CreateDate = DateTime.UtcNow,
-                    UpdateDate = DateTime.UtcNow
+                    StartDate = StartDate.InUtc().LocalDateTime,
+                    CancelDate = CancelDate?.InUtc().LocalDateTime,
+                    CreateDate = now,
+                    UpdateDate = now
                 }
             );
 
@@ -96,8 +105,8 @@ namespace ItpdevelopmentTestProject.Models
         }
 
 
-        public static async System.Threading.Tasks.Task Update(ItpdevelopmentTestProjectContext context, Guid id, string Name, string Project, DateTime StartDate,
-            DateTime? CancelDate, string[]? TextContent, List<byte[]>? FileContent)
+        public static async System.Threading.Tasks.Task Update(ItpdevelopmentTestProjectContext context, Guid id, string Name, string Project, LocalDateTime StartDate,
+            LocalDateTime? CancelDate, string[]? TextContent, List<byte[]>? FileContent)
         {
             using (context)
             {
@@ -109,7 +118,7 @@ namespace ItpdevelopmentTestProject.Models
                     task.ProjectId = new Guid(Project);
                     task.StartDate = StartDate;
                     task.CancelDate = CancelDate;
-                    task.UpdateDate = DateTime.UtcNow;
+                    task.UpdateDate = LocalDateTime.FromDateTime(DateTime.UtcNow);
                 }
 
                 if (TextContent != null)

@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using FormHelper;
 using ItpdevelopmentTestProject.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System;
 using Task = ItpdevelopmentTestProject.Models.Task;
 
@@ -14,10 +15,8 @@ builder.Services.AddControllersWithViews();
 
 
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ItpdevelopmentTestProjectContext>(options => options.UseSqlServer(connection));
+builder.Services.AddDbContext<ItpdevelopmentTestProjectContext>(options => options.UseNpgsql(connection));
 builder.Services.AddControllersWithViews().AddFormHelper();
-//builder.Services.AddFluentValidationAutoValidation();
-//builder.Services.AddScoped<IValidator<Task>, TaskValidator>();
 
 var app = builder.Build();
 

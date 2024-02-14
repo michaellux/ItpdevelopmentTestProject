@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NodaTime;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,15 +20,15 @@ public partial class Task
     [Display(Name = "Start")]
     [BindProperty]
     [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
-    public DateTime StartDate { get; set; }
+    public LocalDateTime StartDate { get; set; }
     [Display(Name = "End")]
     [BindProperty]
     [DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
-    public DateTime? CancelDate { get; set; }
+    public LocalDateTime? CancelDate { get; set; }
 
-    public DateTime CreateDate { get; set; }
+    public LocalDateTime CreateDate { get; set; }
 
-    public DateTime UpdateDate { get; set; }
+    public LocalDateTime UpdateDate { get; set; }
 
     public virtual Project Project { get; set; } = null!;
 
